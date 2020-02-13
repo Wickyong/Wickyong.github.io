@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Blog</title>
-  
-  
+  <title>Wickyong的博客</title>
+  <icon>https://www.gravatar.com/avatar/7481305d74edce9bf067a108af5dce67</icon>
+  <subtitle>果粉一枚-_-</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
@@ -11,7 +11,7 @@
   
   <author>
     <name>Wickyong</name>
-    
+    <email>wy46817@163.com</email>
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
