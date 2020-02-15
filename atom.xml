@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-02-15T12:00:04.535Z</updated>
+  <updated>2020-02-15T13:27:49.524Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>the First</title>
-    <link href="https://wickyong.github.io/2020/02/13/the-First/"/>
-    <id>https://wickyong.github.io/2020/02/13/the-First/</id>
-    <published>2020-02-13T05:24:42.000Z</published>
-    <updated>2020-02-15T12:00:04.535Z</updated>
+    <title>写于2020.2.15晚</title>
+    <link href="https://wickyong.github.io/2020/02/15/%E5%86%99%E4%BA%8E2020-2-15%E6%99%9A/"/>
+    <id>https://wickyong.github.io/2020/02/15/%E5%86%99%E4%BA%8E2020-2-15%E6%99%9A/</id>
+    <published>2020-02-15T13:22:06.000Z</published>
+    <updated>2020-02-15T13:27:49.524Z</updated>
     
     <summary type="html">
     
@@ -29,30 +29,9 @@
       
         
         
-          &lt;p&gt;现在是2月15日,2020年,晚上19:58,我正在重新搭建一个小博客,选了 这个Ocean海洋
-        
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="https://wickyong.github.io/2020/02/13/hello-world/"/>
-    <id>https://wickyong.github.io/2020/02/13/hello-world/</id>
-    <published>2020-02-13T04:28:02.150Z</published>
-    <updated>2020-02-13T04:28:02.151Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a
+          &lt;p&gt;2020年开年的事,大家都知道了,目前仍然在经历着…&lt;/p&gt;
+&lt;p&gt;各方面政策的原因,我还呆在老家,那就找点事情捣鼓捣鼓吧:买了云主机,开了VPN,&lt;/p&gt;
+&lt;p&gt;订了网上课程…其实我只是想搭个个人博客,那么,这就是 2020年
         
       
     
