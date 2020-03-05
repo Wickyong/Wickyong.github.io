@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-03-05T13:51:21.667Z</updated>
+  <updated>2020-03-05T13:57:47.292Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://wickyong.github.io/2020/03/05/2020-3-5/"/>
     <id>https://wickyong.github.io/2020/03/05/2020-3-5/</id>
     <published>2020-03-05T11:16:28.000Z</published>
-    <updated>2020-03-05T13:51:21.667Z</updated>
+    <updated>2020-03-05T13:57:47.292Z</updated>
     
     <summary type="html">
     
@@ -30,11 +30,10 @@
         
         
           &lt;p&gt;静态分析工具 infer 的简单使用&lt;/p&gt;
-&lt;p&gt;在iOS开发中或许会用到的一款静态分析的工具类 - Inter, 对于这个工具,网上也有相关介绍.&lt;/p&gt;
-&lt;p&gt;这里,记录一下使用步骤:&lt;/p&gt;
+&lt;p&gt;在iOS开发中或许会用到一款用于静态分析的工具类 - infer, 对于这个工具的出处和原理,网上也有相关介绍.&lt;/p&gt;
+&lt;p&gt;这里,简单记录一下使用步骤:&lt;/p&gt;
 &lt;p&gt;1)安装:&lt;/p&gt;
-&lt;p&gt;​    终端输入:&lt;/p&gt;
-&lt;p&gt;​ 
+&lt;p&gt;​   
         
       
     
