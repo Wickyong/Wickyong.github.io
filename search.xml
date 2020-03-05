@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>2020-3-5</title>
+    <url>/2020/03/05/2020-3-5/</url>
+    <content><![CDATA[<p>学习记录:</p>
+<p>在iOS开发中或许会用到的一款静态分析的工具类 - Inter, 对于这款开具,网上也有相关介绍.</p>
+<p>这里,记录一下使用步骤:</p>
+<p>1)安装:</p>
+<p>​    终端输入:</p>
+<p>​    brew install infer</p>
+<p>​    涉及到软件更新,依赖库安装,安装时间可能较长,具体依网络状况而定.</p>
+<p>2)使用:</p>
+<p>​    终端进入项目目录:</p>
+<p>​    $ cd &lt;项目所在目录&gt;</p>
+<p>​    使用如下命令编译:</p>
+<p>​    infer – xcodebuild -target 项目名 -configuration Debug -sdk iphonesimulator</p>
+<p>​    接下来终端中会出现日志信息打印.</p>
+<p>3)结果</p>
+<p>​    在项目所在目录出现 “build”及”infer-out”目录</p>
+<p>​    “infer-out”文件夹中有txt,json等相关文件,分析bugs.txt.</p>
+<p>4)再次使用</p>
+<p>​    由于infer有两种模式:增量与非增量模式</p>
+<p>​    a)增量模式:是在第一次运行 “2)中的编译命令” 后,产生了build和infer-out文件夹,</p>
+<p>​    再次执行该编译命令时,此时就是增量模式.当项目的代码没有改动时,则此时不会有编译结果, 如果项目代码有新的改动之处,此次编译就只产生新的编译结果.</p>
+<p>​    b)非增量模式:当再次执行编译命令前,删除了build和infer-out两个文件夹的时候,执行命令,则会输出所有的编译信息,相当于首次编译的情形.</p>
+<p>​    所以手动使用非增量模式的方法:</p>
+<p>​    一: 名称执行编译命令前,先删除build和infer-out文件夹(如果有的话)</p>
+<p>​    二:编译命令的最后追加”clean”, 即:</p>
+<p>​    xcodebuild -target 项目名称 -configuration Debug -sdk iphonesimulator clean</p>
+<p>​    对于infer静态分析的原理,感兴趣可以google一下.</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>2020.2.16</title>
     <url>/2020/02/16/2020-2-16/</url>
     <content><![CDATA[<p>​    昨晚外面还在风雨交加,今天就是个大太阳,就是温度有点低.</p>
