@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>2020-3-26</title>
+    <title>Git在终端中的一些常用命令</title>
     <url>/2020/03/26/2020-3-26/</url>
     <content><![CDATA[<p>Git在终端中的一些常用命令</p>
 <p>公司搭建了自有服务器搭建gitLab用于代码托管, 虽说有像source tree, Tower等非常好用的可视化git管理软件,但也有很多人热衷于在终端上使用git命令,有种返璞归真的意思,今天就自己简单回顾了一些常用的git命令, 毕竟好记性不如烂笔头.</p>
@@ -65,6 +65,9 @@
 <p>#强制更新(不建议使用)</p>
 <p>……暂时写这么多吧</p>
 ]]></content>
+      <categories>
+        <category>通用</category>
+      </categories>
       <tags>
         <tag>开发工具</tag>
       </tags>
