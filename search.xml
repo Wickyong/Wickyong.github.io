@@ -3,12 +3,16 @@
   <entry>
     <title>iOS中获取当前内存值的一个函数</title>
     <url>/2020/04/16/3-31/</url>
-    <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。代码如下：</p>
+    <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。</p>
+<p>调用该函数需要导入头文件:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;sys&#x2F;sysctl.h&gt;</span><br><span class="line">#import &lt;mach&#x2F;mach.h&gt;</span><br></pre></td></tr></table></figure>
+
+<p>代码如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct mach_task_basic_info info;</span><br><span class="line"></span><br><span class="line">mach_msg_type_number_t size &#x3D; sizeof(info);</span><br><span class="line"></span><br><span class="line">kern_return_t kl &#x3D; task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&amp;info, &amp;size);</span><br></pre></td></tr></table></figure>
 
 <p>在这段代码中，名为 task_info_t  的结构里包含了一个 resident_size 字段，用于表示使用了多少内存。</p>
 <p>当发现有App内存警告，可以借此获取当前 App 占用了多少内存。代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">float used_mem &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_mem &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">float used_memory &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>iOS</category>
       </categories>
