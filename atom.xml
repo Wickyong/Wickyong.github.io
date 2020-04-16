@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-04-16T08:30:20.181Z</updated>
+  <updated>2020-04-16T08:31:07.494Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>iOS中获取当前内存值的一个函数</title>
+    <title>iOS中获取内存值的方法</title>
     <link href="https://wickyong.github.io/2020/04/16/3-31/"/>
     <id>https://wickyong.github.io/2020/04/16/3-31/</id>
     <published>2020-04-16T08:01:06.000Z</published>
-    <updated>2020-04-16T08:30:20.181Z</updated>
+    <updated>2020-04-16T08:31:07.494Z</updated>
     
     <summary type="html">
     
