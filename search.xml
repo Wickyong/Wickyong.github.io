@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>iOS中获取内存值的方法</title>
+    <url>/2020/04/16/3-31/</url>
+    <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。</p>
+<p>调用该函数需要导入头文件:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;sys&#x2F;sysctl.h&gt;</span><br><span class="line">#import &lt;mach&#x2F;mach.h&gt;</span><br></pre></td></tr></table></figure>
+
+<p>代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct mach_task_basic_info info;</span><br><span class="line"></span><br><span class="line">mach_msg_type_number_t size &#x3D; sizeof(info);</span><br><span class="line"></span><br><span class="line">kern_return_t kl &#x3D; task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&amp;info, &amp;size);</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，名为 task_info_t  的结构里包含了一个 resident_size 字段，用于表示使用了多少内存。</p>
+<p>当发现有App内存警告，可以借此获取当前 App 占用了多少内存。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">float used_memory &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>
+
+<p>另外 ,也可以获取当前设备可用的内存, 代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vm_statistics_data_t vmStats;</span><br><span class="line">mach_msg_type_number_t infoCount &#x3D; HOST_VM_INFO_COUNT;</span><br><span class="line">kern_return_t kernReturn &#x3D; host_statistics(mach_host_self(), </span><br><span class="line">                                               HOST_VM_INFO, </span><br><span class="line">                                      (host_info_t)&amp;vmStats, </span><br><span class="line">                                                &amp;infoCount);</span><br><span class="line">float free_memory &#x3D; vm_page_size *vmStats.free_count;</span><br><span class="line">NSLog(@&quot;App可用 %f MB 内存&quot;, free_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>App耗电量检测</title>
-    <url>/2020/04/16/4-5/</url>
+    <url>/2020/04/05/4-5/</url>
     <content><![CDATA[<p>虽说现在iOS手机的电池续航越来越持久了,实在不行还有充电宝,快充设备,耗电量似乎不是问题,对用户感知不明显,用户会觉得是手机整体耗电量大,或者机子老化…</p>
 <p>作为iOS开发者,还是要对自己开发的App精益求精,所以耗电量问题实际上还是要研究一下的.查看耗电量问题,需要知道是代码哪个地方出现问题,或者说是哪个线程有问题.</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">thread_act_array_t threads;</span><br><span class="line">mach_msg_type_number_t threadsCount &#x3D; 0;</span><br><span class="line">const task_t thisTask &#x3D; mach_task_self();</span><br><span class="line">kern_return_t kr &#x3D; task_threads(thisTask, &amp;threads, &amp;threadsCount);</span><br></pre></td></tr></table></figure>
@@ -20,29 +43,6 @@
 
 <p>(注:本文参考了戴铭的极客时间专栏)</p>
 ]]></content>
-      <categories>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>开发工具</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>iOS中获取内存值的方法</title>
-    <url>/2020/04/16/3-31/</url>
-    <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。</p>
-<p>调用该函数需要导入头文件:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;sys&#x2F;sysctl.h&gt;</span><br><span class="line">#import &lt;mach&#x2F;mach.h&gt;</span><br></pre></td></tr></table></figure>
-
-<p>代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct mach_task_basic_info info;</span><br><span class="line"></span><br><span class="line">mach_msg_type_number_t size &#x3D; sizeof(info);</span><br><span class="line"></span><br><span class="line">kern_return_t kl &#x3D; task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&amp;info, &amp;size);</span><br></pre></td></tr></table></figure>
-
-<p>在这段代码中，名为 task_info_t  的结构里包含了一个 resident_size 字段，用于表示使用了多少内存。</p>
-<p>当发现有App内存警告，可以借此获取当前 App 占用了多少内存。代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">float used_memory &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>
-
-<p>另外 ,也可以获取当前设备可用的内存, 代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vm_statistics_data_t vmStats;</span><br><span class="line">mach_msg_type_number_t infoCount &#x3D; HOST_VM_INFO_COUNT;</span><br><span class="line">kern_return_t kernReturn &#x3D; host_statistics(mach_host_self(), </span><br><span class="line">                                               HOST_VM_INFO, </span><br><span class="line">                                      (host_info_t)&amp;vmStats, </span><br><span class="line">                                                &amp;infoCount);</span><br><span class="line">float free_memory &#x3D; vm_page_size *vmStats.free_count;</span><br><span class="line">NSLog(@&quot;App可用 %f MB 内存&quot;, free_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>iOS</category>
       </categories>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-04-16T11:32:55.777Z</updated>
+  <updated>2020-04-16T08:31:07.494Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -15,34 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>App耗电量检测</title>
-    <link href="https://wickyong.github.io/2020/04/16/4-5/"/>
-    <id>https://wickyong.github.io/2020/04/16/4-5/</id>
-    <published>2020-04-16T10:08:53.000Z</published>
-    <updated>2020-04-16T11:32:55.777Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;虽说现在iOS手机的电池续航越来越持久了,实在不行还有充电宝,快充设备,耗电量似乎不是问题,对用户感知不明显,用户会觉得是手机整体耗电量大,或者机子老化…&lt;/p&gt;
-&lt;p&gt;作为iOS开发者,还是要对自己开发的App精益求精,所以耗电量问题实际上还是要研究一下的.查看耗电量问题
-        
-      
-    
-    </summary>
-    
-    
-      <category term="iOS" scheme="https://Wickyong.github.io/categories/iOS/"/>
-    
-    
-      <category term="开发工具" scheme="https://Wickyong.github.io/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/"/>
-    
-  </entry>
   
   <entry>
     <title>iOS中获取内存值的方法</title>
@@ -60,6 +32,34 @@
           &lt;p&gt;iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。&lt;/p&gt;
 &lt;p&gt;调用该函数需要导入头文件:&lt;/p&gt;
 &lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+    
+      <category term="iOS" scheme="https://Wickyong.github.io/categories/iOS/"/>
+    
+    
+      <category term="开发工具" scheme="https://Wickyong.github.io/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>App耗电量检测</title>
+    <link href="https://wickyong.github.io/2020/04/05/4-5/"/>
+    <id>https://wickyong.github.io/2020/04/05/4-5/</id>
+    <published>2020-04-05T11:08:53.000Z</published>
+    <updated>2020-04-16T11:34:47.997Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;虽说现在iOS手机的电池续航越来越持久了,实在不行还有充电宝,快充设备,耗电量似乎不是问题,对用户感知不明显,用户会觉得是手机整体耗电量大,或者机子老化…&lt;/p&gt;
+&lt;p&gt;作为iOS开发者,还是要对自己开发的App精益求精,所以耗电量问题实际上还是要研究一下的.查看耗电量问题
         
       
     
