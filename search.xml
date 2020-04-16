@@ -1,132 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>利用RunLoop监控卡顿</title>
-      <link href="/2020/03/28/3-28/"/>
-      <url>/2020/03/28/3-28/</url>
-      
-        <content type="html"><![CDATA[<p>利用RunLoop监控卡顿</p><p>通过学习了戴铭大神的专栏, Get到了在App开发过程中可以利用Runloop来监控App在运行期间的卡顿,卡顿问题是老生常谈 ,并且很影响用户体验,这里截取部分关键步骤,作为自己的参考.</p><p>RunLoop的6种状态</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;% codeblock %&#125;typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;</span><br><span class="line">    kCFRunLoopEntry , &#x2F;&#x2F; 进入 loop</span><br><span class="line">    kCFRunLoopBeforeTimers , &#x2F;&#x2F; 触发 Timer 回调</span><br><span class="line">    kCFRunLoopBeforeSources , &#x2F;&#x2F; 触发 Source0 回调</span><br><span class="line">    kCFRunLoopBeforeWaiting , &#x2F;&#x2F; 等待 mach_port 消息</span><br><span class="line">    kCFRunLoopAfterWaiting ), &#x2F;&#x2F; 接收 mach_port 消息</span><br><span class="line">    kCFRunLoopExit , &#x2F;&#x2F; 退出 loop</span><br><span class="line">    kCFRunLoopAllActivities  &#x2F;&#x2F; loop 所有状态改变</span><br><span class="line">&#125;</span><br><span class="line">&#123;% endcodeblock %&#125;</span><br></pre></td></tr></table></figure><p>监听 RunLoop，首先需要创建一个 CFRunLoopObserverContext 观察者</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% codeblock %&#125;</span><br><span class="line">CFRunLoopObserverContext context &#x3D; &#123;0,(__bridge void*)self,NULL,NULL&#125;;</span><br><span class="line">runLoopObserver &#x3D; CFRunLoopObserverCreate(kCFAllocatorDefault,kCFRunLoopAllActivities,YES,0,&amp;runLoopObserverCallBack,&amp;context);</span><br><span class="line">&#123;% endcodeblock %&#125;</span><br></pre></td></tr></table></figure><p>将创建好的观察者 runLoopObserver 添加到主线程 RunLoop 的 common 模式下观察。然后，创建一个持续的子线程专门用来监控主线程的 RunLoop 状态。一旦发现进入睡眠前的 kCFRunLoopBeforeSources 状态，或者唤醒后的状态 kCFRunLoopAfterWaiting，在设置的时间阈值内一直没有变化，即可判定为卡顿。接下来，就可以 dump 出堆栈的信息，从而进一步分析出具体是哪个方法的执行时间过长.</p><p>开启一个子线程监控的代码如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;% codeblock %&#125;</span><br><span class="line">&#x2F;&#x2F;创建子线程监控</span><br><span class="line">dispatch_async(dispatch_get_global_queue(0, 0), ^&#123;</span><br><span class="line">    &#x2F;&#x2F;子线程开启一个持续的 loop 用来进行监控</span><br><span class="line">    while (YES) &#123;</span><br><span class="line">        long semaphoreWait &#x3D; dispatch_semaphore_wait(dispatchSemaphore, dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC));</span><br><span class="line">        if (semaphoreWait !&#x3D; 0) &#123;</span><br><span class="line">            if (!runLoopObserver) &#123;</span><br><span class="line">                timeoutCount &#x3D; 0;</span><br><span class="line">                dispatchSemaphore &#x3D; 0;</span><br><span class="line">                runLoopActivity &#x3D; 0;</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;BeforeSources 和 AfterWaiting 这两个状态能够检测到是否卡顿</span><br><span class="line">            if (runLoopActivity &#x3D;&#x3D; kCFRunLoopBeforeSources || runLoopActivity &#x3D;&#x3D; kCFRunLoopAfterWaiting) &#123;</span><br><span class="line">                &#x2F;&#x2F;将堆栈信息上报服务器的代码放到这里</span><br><span class="line">            &#125; &#x2F;&#x2F;end activity</span><br><span class="line">        &#125;&#x2F;&#x2F; end semaphore wait</span><br><span class="line">        timeoutCount &#x3D; 0;</span><br><span class="line">    &#125;&#x2F;&#x2F; end while</span><br><span class="line">&#125;);</span><br><span class="line">&#123;% endcodeblock %&#125;</span><br></pre></td></tr></table></figure><p>获取卡顿的方法堆栈信息</p><p>获取堆栈信息的一种方法是直接调用系统函数。这种方法的优点在于，性能消耗小。但是，它只能够获取简单的信息，也没有办法配合 dSYM 来获取具体是哪行代码出了问题，而且能够获取的信息类型也有限。这种方法，因为性能比较好，所以适用于观察大盘统计卡顿情况，而不是想要找到卡顿原因的场景。直接调用系统函数方法的主要思路是：用 signal 进行错误信息的获取。具体代码如下:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">&#123;% codeblock %&#125;</span><br><span class="line">static int s_fatal_signals[] &#x3D; &#123;</span><br><span class="line">    SIGABRT,</span><br><span class="line">    SIGBUS,</span><br><span class="line">    SIGFPE,</span><br><span class="line">    SIGILL,</span><br><span class="line">    SIGSEGV,</span><br><span class="line">    SIGTRAP,</span><br><span class="line">    SIGTERM,</span><br><span class="line">    SIGKILL,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">static int s_fatal_signal_num &#x3D; sizeof(s_fatal_signals) &#x2F; sizeof(s_fatal_signals[0]);</span><br><span class="line"></span><br><span class="line">void UncaughtExceptionHandler(NSException *exception) &#123;</span><br><span class="line">    NSArray *exceptionArray &#x3D; [exception callStackSymbols]; &#x2F;&#x2F;得到当前调用栈信息</span><br><span class="line">    NSString *exceptionReason &#x3D; [exception reason];       &#x2F;&#x2F;非常重要，就是崩溃的原因</span><br><span class="line">    NSString *exceptionName &#x3D; [exception name];           &#x2F;&#x2F;异常类型</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void SignalHandler(int code)</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;signal handler &#x3D; %d&quot;,code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void InitCrashReport()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F;系统错误信号捕获</span><br><span class="line">    for (int i &#x3D; 0; i &lt; s_fatal_signal_num; ++i) &#123;</span><br><span class="line">        signal(s_fatal_signals[i], SignalHandler);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;oc未捕获异常的捕获</span><br><span class="line">    NSSetUncaughtExceptionHandler(&amp;UncaughtExceptionHandler);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        InitCrashReport();</span><br><span class="line">        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));</span><br><span class="line">&#123;% endcodeblock %&#125;</span><br></pre></td></tr></table></figure><p>另一种方法是，直接用 PLCrashReporter这个开源的第三方库来获取堆栈信息。这种方法的特点是，能够定位到问题代码的具体位置，而且性能消耗也不大。所以，也是戴铭大神推荐的获取堆栈信息的方法。具体如何使用 PLCrashReporter 来获取堆栈信息，代码如下所示：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;% codeblock %&#125;</span><br><span class="line">&#x2F;&#x2F; 获取数据</span><br><span class="line">NSData *lagData &#x3D; [[[PLCrashReporter alloc] initWithConfiguration:[[PLCrashReporterConfig alloc] initWithSignalHandlerType:PLCrashReporterSignalHandlerTypeBSD symbolicationStrategy:PLCrashReporterSymbolicationStrategyAll]] generateLiveReport];</span><br><span class="line">&#x2F;&#x2F; 转换成 PLCrashReport 对象</span><br><span class="line">PLCrashReport *lagReport &#x3D; [[PLCrashReport alloc] initWithData:lagData error:NULL];</span><br><span class="line">&#x2F;&#x2F; 进行字符串格式化处理</span><br><span class="line">NSString *lagReportString &#x3D; [PLCrashReportTextFormatter stringValueForCrashReport:lagReport withTextFormat:PLCrashReportTextFormatiOS];</span><br><span class="line">&#x2F;&#x2F;将字符串上传服务器</span><br><span class="line">NSLog(@&quot;lag happen, detail below: \n %@&quot;,lagReportString);</span><br><span class="line">&#123;% endcodeblock %&#125;</span><br></pre></td></tr></table></figure><p>搜集到卡顿的方法堆栈信息以后，分析并解决卡顿问题。</p><p>(以上内容摘自戴铭的极客时间专栏)</p>]]></content>
-      
-      
+<search>
+  <entry>
+    <title>iOS中获取当前内存值的一个函数</title>
+    <url>/2020/04/16/3-31/</url>
+    <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct mach_task_basic_info info;</span><br><span class="line"></span><br><span class="line">mach_msg_type_number_t size &#x3D; sizeof(info);</span><br><span class="line"></span><br><span class="line">kern_return_t kl &#x3D; task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&amp;info, &amp;size);</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，名为 task_info_t  的结构里包含了一个 resident_size 字段，用于表示使用了多少内存。</p>
+<p>当发现有App内存警告，可以借此获取当前 App 占用了多少内存。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">float used_mem &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_mem &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Git在终端中的一些常用命令</title>
-      <link href="/2020/03/26/2020-3-26/"/>
-      <url>/2020/03/26/2020-3-26/</url>
-      
-        <content type="html"><![CDATA[<p>Git在终端中的一些常用命令</p><p>公司以自有服务器搭建gitLab用于代码托管, 虽说有像source tree, Tower等非常好用的可视化git管理软件,但也有很多人热衷于在终端上使用git命令,有种返璞归真的意思,今天就自己简单回顾了一些常用的git命令, 毕竟好记性不如烂笔头.</p><p>git mv xxx kkkk</p><p>#简便修改git文件的文件名</p><p>然后直接commit 提交</p><p>git log —oneline</p><p>#查看简便log历史</p><p>git log —all</p><p>#查看所有log所有分支 </p><p>git log —graph</p><p>#查看可视化log历史</p><p>git log —n4</p><p>#查看所有log记录的前4条</p><p>(commit:保存的快照,tree:相当于文件夹 ,blob:相当于文件)</p><p>git cat-file -p 1234567..(hash值)</p><p>#通过hash值查看git文件 </p><p>git cat-file -t 1234567..(hash值)</p><p>#通过hash值查看git文件格式(commit/tree/blob)</p><p>git diff 123456 7891011</p><p>#通过两个commit的hash值比较变更差异</p><p>git diff HEAD HEAD^1^1 (等同于git diff HEAD HEAD^^  或git diff HEAD HEAD~2)</p><p>#比较当前HEAD和父HEAD的父HEAD的变更差异</p><p>git branch -D 123456(分支名)</p><p>#删除指定名字的分支</p><p>git commit -amend </p><p>#对最近的一次commit的message做修改变更</p><p>git rebase -i 1234(需要修改的commit的父commit)</p><p>#对历史任意一次commit做变更</p><p>git rebase -i  </p><p>#pick改为s 进行commit合并</p><p>git diff —cached</p><p>#比较暂存区和HEAD所含文件的差异</p><p>git reset HEAD</p><p>#让暂存区恢复成和HEAD的一样,命令后可跟具体</p><p>文件名,即可具体到指定文件</p><p>git checkout — 文件名</p><p>#让工作区的文件恢复为和暂存区一样</p><p>git reset —hard 123456(commit的hash值)</p><p>#消除最近到指定某次commit的提交</p><p>git rm filename</p><p>#删除指定文件并同步到暂存区</p><p>git stash</p><p>#提交工作区文件到暂存区</p><p>git stash list</p><p>#查看暂存区文件列表</p><p>git stash pop</p><p>#将暂存区文件恢复到工作区,且暂存区内容清除</p><p>git stash apply</p><p>##将暂存区文件恢复到工作区,且暂存区内容保留</p><p>.gitignore 指定不需要git管理的文件</p><p>git clone </p><p>#git仓库备份到本地</p><p>git push</p><p>#本地提交到git仓库</p><p>git remote -v</p><p>#查看本地和远程建立联系的列表</p><p>git merge</p><p>#由git智能合并</p><p>git push -f</p><p>#强制更新(不建议使用)</p><p>……暂时写这么多吧</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>利用RunLoop监控卡顿</title>
+    <url>/2020/03/28/3-28/</url>
+    <content><![CDATA[<p>利用RunLoop监控卡顿</p>
+<p>通过学习了戴铭大神的专栏, Get到了在App开发过程中可以利用Runloop来监控App在运行期间的卡顿,卡顿问题是老生常谈 ,并且很影响用户体验,这里截取部分关键步骤,作为自己的参考.</p>
+<p>RunLoop的6种状态</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;</span><br><span class="line">    kCFRunLoopEntry , &#x2F;&#x2F; 进入 loop</span><br><span class="line">    kCFRunLoopBeforeTimers , &#x2F;&#x2F; 触发 Timer 回调</span><br><span class="line">    kCFRunLoopBeforeSources , &#x2F;&#x2F; 触发 Source0 回调</span><br><span class="line">    kCFRunLoopBeforeWaiting , &#x2F;&#x2F; 等待 mach_port 消息</span><br><span class="line">    kCFRunLoopAfterWaiting ), &#x2F;&#x2F; 接收 mach_port 消息</span><br><span class="line">    kCFRunLoopExit , &#x2F;&#x2F; 退出 loop</span><br><span class="line">    kCFRunLoopAllActivities  &#x2F;&#x2F; loop 所有状态改变</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>监听 RunLoop，首先需要创建一个 CFRunLoopObserverContext 观察者</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CFRunLoopObserverContext context &#x3D; &#123;0,(__bridge void*)self,NULL,NULL&#125;;</span><br><span class="line">runLoopObserver &#x3D; CFRunLoopObserverCreate(kCFAllocatorDefault,kCFRunLoopAllActivities,YES,0,&amp;runLoopObserverCallBack,&amp;context);</span><br></pre></td></tr></table></figure>
+
+<p>将创建好的观察者 runLoopObserver 添加到主线程 RunLoop 的 common 模式下观察。然后，创建一个持续的子线程专门用来监控主线程的 RunLoop 状态。一旦发现进入睡眠前的 kCFRunLoopBeforeSources 状态，或者唤醒后的状态 kCFRunLoopAfterWaiting，在设置的时间阈值内一直没有变化，即可判定为卡顿。接下来，就可以 dump 出堆栈的信息，从而进一步分析出具体是哪个方法的执行时间过长.</p>
+<p>开启一个子线程监控的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;创建子线程监控</span><br><span class="line">dispatch_async(dispatch_get_global_queue(0, 0), ^&#123;</span><br><span class="line">    &#x2F;&#x2F;子线程开启一个持续的 loop 用来进行监控</span><br><span class="line">    while (YES) &#123;</span><br><span class="line">        long semaphoreWait &#x3D; dispatch_semaphore_wait(dispatchSemaphore, dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC));</span><br><span class="line">        if (semaphoreWait !&#x3D; 0) &#123;</span><br><span class="line">            if (!runLoopObserver) &#123;</span><br><span class="line">                timeoutCount &#x3D; 0;</span><br><span class="line">                dispatchSemaphore &#x3D; 0;</span><br><span class="line">                runLoopActivity &#x3D; 0;</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;BeforeSources 和 AfterWaiting 这两个状态能够检测到是否卡顿</span><br><span class="line">            if (runLoopActivity &#x3D;&#x3D; kCFRunLoopBeforeSources || runLoopActivity &#x3D;&#x3D; kCFRunLoopAfterWaiting) &#123;</span><br><span class="line">                &#x2F;&#x2F;将堆栈信息上报服务器的代码放到这里</span><br><span class="line">            &#125; &#x2F;&#x2F;end activity</span><br><span class="line">        &#125;&#x2F;&#x2F; end semaphore wait</span><br><span class="line">        timeoutCount &#x3D; 0;</span><br><span class="line">    &#125;&#x2F;&#x2F; end while</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>获取卡顿的方法堆栈信息</p>
+<p>获取堆栈信息的一种方法是直接调用系统函数。这种方法的优点在于，性能消耗小。但是，它只能够获取简单的信息，也没有办法配合 dSYM 来获取具体是哪行代码出了问题，而且能够获取的信息类型也有限。这种方法，因为性能比较好，所以适用于观察大盘统计卡顿情况，而不是想要找到卡顿原因的场景。直接调用系统函数方法的主要思路是：用 signal 进行错误信息的获取。具体代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">static int s_fatal_signals[] &#x3D; &#123;</span><br><span class="line">    SIGABRT,</span><br><span class="line">    SIGBUS,</span><br><span class="line">    SIGFPE,</span><br><span class="line">    SIGILL,</span><br><span class="line">    SIGSEGV,</span><br><span class="line">    SIGTRAP,</span><br><span class="line">    SIGTERM,</span><br><span class="line">    SIGKILL,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">static int s_fatal_signal_num &#x3D; sizeof(s_fatal_signals) &#x2F; sizeof(s_fatal_signals[0]);</span><br><span class="line"></span><br><span class="line">void UncaughtExceptionHandler(NSException *exception) &#123;</span><br><span class="line">    NSArray *exceptionArray &#x3D; [exception callStackSymbols]; &#x2F;&#x2F;得到当前调用栈信息</span><br><span class="line">    NSString *exceptionReason &#x3D; [exception reason];       &#x2F;&#x2F;非常重要，就是崩溃的原因</span><br><span class="line">    NSString *exceptionName &#x3D; [exception name];           &#x2F;&#x2F;异常类型</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void SignalHandler(int code)</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;signal handler &#x3D; %d&quot;,code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void InitCrashReport()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F;系统错误信号捕获</span><br><span class="line">    for (int i &#x3D; 0; i &lt; s_fatal_signal_num; ++i) &#123;</span><br><span class="line">        signal(s_fatal_signals[i], SignalHandler);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;oc未捕获异常的捕获</span><br><span class="line">    NSSetUncaughtExceptionHandler(&amp;UncaughtExceptionHandler);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        InitCrashReport();</span><br><span class="line">        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));</span><br></pre></td></tr></table></figure>
+
+<p>另一种方法是，直接用 PLCrashReporter这个开源的第三方库来获取堆栈信息。这种方法的特点是，能够定位到问题代码的具体位置，而且性能消耗也不大。所以，也是戴铭大神推荐的获取堆栈信息的方法。具体如何使用 PLCrashReporter 来获取堆栈信息，代码如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 获取数据</span><br><span class="line">NSData *lagData &#x3D; [[[PLCrashReporter alloc] initWithConfiguration:[[PLCrashReporterConfig alloc] initWithSignalHandlerType:PLCrashReporterSignalHandlerTypeBSD symbolicationStrategy:PLCrashReporterSymbolicationStrategyAll]] generateLiveReport];</span><br><span class="line">&#x2F;&#x2F; 转换成 PLCrashReport 对象</span><br><span class="line">PLCrashReport *lagReport &#x3D; [[PLCrashReport alloc] initWithData:lagData error:NULL];</span><br><span class="line">&#x2F;&#x2F; 进行字符串格式化处理</span><br><span class="line">NSString *lagReportString &#x3D; [PLCrashReportTextFormatter stringValueForCrashReport:lagReport withTextFormat:PLCrashReportTextFormatiOS];</span><br><span class="line">&#x2F;&#x2F;将字符串上传服务器</span><br><span class="line">NSLog(@&quot;lag happen, detail below: \n %@&quot;,lagReportString);</span><br></pre></td></tr></table></figure>
+
+<p>搜集到卡顿的方法堆栈信息以后，分析并解决卡顿问题。</p>
+<p>(以上内容摘自戴铭的极客时间专栏)</p>
+]]></content>
       <categories>
-          
-          <category> 通用 </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于静态分析工具 infer 的简单使用</title>
-      <link href="/2020/03/05/2020-3-5/"/>
-      <url>/2020/03/05/2020-3-5/</url>
-      
-        <content type="html"><![CDATA[<p>静态分析工具 infer 的简单使用</p><p>在iOS开发中或许会用到一款用于静态分析的工具 - infer, 对于这个工具的出处和原理,网上也有相关介绍.</p><p>这里,简单记录一下使用步骤:</p><p>1)安装:</p><p>​    终端输入:</p><p>​    brew install infer</p><p>​    涉及到软件更新,依赖库安装,安装时间可能较长,具体依网络状况而定.</p><p>2)使用:</p><p>​    终端进入项目目录:</p><p>​    $ cd &lt;项目所在目录&gt;</p><p>​    使用如下命令编译:</p><p>​    infer – xcodebuild -target 项目名 -configuration Debug -sdk iphonesimulator</p><p>​    接下来终端中会出现日志信息打印.</p><p>3)结果</p><p>​    在项目所在目录出现 “build”及”infer-out”目录</p><p>​    “infer-out”文件夹中有txt,json等相关文件,分析bugs.txt.</p><p>4)再次使用</p><p>​    由于infer有两种模式:增量与非增量模式</p><p>​    a)增量模式:是在第一次运行 “2)中的编译命令” 后,产生了build和infer-out文件夹,</p><p>​    再次执行该编译命令时,此时就是增量模式.当项目的代码没有改动时,则此时不会有编译结果, 如果项目代码有新的改动之处,此次编译就只产生新的编译结果.</p><p>​    b)非增量模式:当再次执行编译命令前,删除了build和infer-out两个文件夹的时候,执行命令,则会输出所有的编译信息,相当于首次编译的情形.</p><p>​    所以手动使用非增量模式的方法:</p><p>​    一: 执行编译命令前,先删除build和infer-out文件夹(如果有的话)</p><p>​    二: 在编译命令的最后追加”clean”, 即:</p><p>​    xcodebuild -target 项目名称 -configuration Debug -sdk iphonesimulator clean</p><p>​    对于infer静态分析的原理,感兴趣可以google一下.</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git在终端中的一些常用命令</title>
+    <url>/2020/03/26/2020-3-26/</url>
+    <content><![CDATA[<p>Git在终端中的一些常用命令</p>
+<p>公司以自有服务器搭建gitLab用于代码托管, 虽说有像source tree, Tower等非常好用的可视化git管理软件,但也有很多人热衷于在终端上使用git命令,有种返璞归真的意思,今天就自己简单回顾了一些常用的git命令, 毕竟好记性不如烂笔头.</p>
+<p>git mv xxx kkkk</p>
+<p>#简便修改git文件的文件名</p>
+<p>然后直接commit 提交</p>
+<p>git log —oneline</p>
+<p>#查看简便log历史</p>
+<p>git log —all</p>
+<p>#查看所有log所有分支 </p>
+<p>git log —graph</p>
+<p>#查看可视化log历史</p>
+<p>git log —n4</p>
+<p>#查看所有log记录的前4条</p>
+<p>(commit:保存的快照,tree:相当于文件夹 ,blob:相当于文件)</p>
+<p>git cat-file -p 1234567..(hash值)</p>
+<p>#通过hash值查看git文件 </p>
+<p>git cat-file -t 1234567..(hash值)</p>
+<p>#通过hash值查看git文件格式(commit/tree/blob)</p>
+<p>git diff 123456 7891011</p>
+<p>#通过两个commit的hash值比较变更差异</p>
+<p>git diff HEAD HEAD^1^1 (等同于git diff HEAD HEAD^^  或git diff HEAD HEAD~2)</p>
+<p>#比较当前HEAD和父HEAD的父HEAD的变更差异</p>
+<p>git branch -D 123456(分支名)</p>
+<p>#删除指定名字的分支</p>
+<p>git commit -amend </p>
+<p>#对最近的一次commit的message做修改变更</p>
+<p>git rebase -i 1234(需要修改的commit的父commit)</p>
+<p>#对历史任意一次commit做变更</p>
+<p>git rebase -i  </p>
+<p>#pick改为s 进行commit合并</p>
+<p>git diff —cached</p>
+<p>#比较暂存区和HEAD所含文件的差异</p>
+<p>git reset HEAD</p>
+<p>#让暂存区恢复成和HEAD的一样,命令后可跟具体</p>
+<p>文件名,即可具体到指定文件</p>
+<p>git checkout — 文件名</p>
+<p>#让工作区的文件恢复为和暂存区一样</p>
+<p>git reset —hard 123456(commit的hash值)</p>
+<p>#消除最近到指定某次commit的提交</p>
+<p>git rm filename</p>
+<p>#删除指定文件并同步到暂存区</p>
+<p>git stash</p>
+<p>#提交工作区文件到暂存区</p>
+<p>git stash list</p>
+<p>#查看暂存区文件列表</p>
+<p>git stash pop</p>
+<p>#将暂存区文件恢复到工作区,且暂存区内容清除</p>
+<p>git stash apply</p>
+<p>##将暂存区文件恢复到工作区,且暂存区内容保留</p>
+<p>.gitignore 指定不需要git管理的文件</p>
+<p>git clone </p>
+<p>#git仓库备份到本地</p>
+<p>git push</p>
+<p>#本地提交到git仓库</p>
+<p>git remote -v</p>
+<p>#查看本地和远程建立联系的列表</p>
+<p>git merge</p>
+<p>#由git智能合并</p>
+<p>git push -f</p>
+<p>#强制更新(不建议使用)</p>
+<p>……暂时写这么多吧</p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>通用</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>随笔一则</title>
-      <link href="/2020/02/16/2020-2-16/"/>
-      <url>/2020/02/16/2020-2-16/</url>
-      
-        <content type="html"><![CDATA[<p>​    昨晚外面还在风雨交加,今天就是个大太阳,就是温度有点低.</p><p>​    看今天的网络,仿佛一场自发的摄影大赛,各种抓拍的雪景,虽说疫情当前,但这场短暂的春雪还是给广大网友们带来了一丝快乐,毕竟大家都在家憋坏了……</p><p>​    昨晚还看到东南亚一些国家发出了”放弃疫情防治措施”的新闻,貌似那边就是百姓该吃吃该喝喝,社会正常运作的意思,想来疫情程度不同,号称新冠病杀伤力不如Sara,于是放弃抵抗?!</p><p>​    昨晚西甲的一场比赛,赛前为”中国加油,武汉加油”的仪式还是挺暖心的…咱武汉同胞要加油!</p><p>​    </p><p>​    </p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于静态分析工具 infer 的简单使用</title>
+    <url>/2020/03/05/2020-3-5/</url>
+    <content><![CDATA[<p>静态分析工具 infer 的简单使用</p>
+<p>在iOS开发中或许会用到一款用于静态分析的工具 - infer, 对于这个工具的出处和原理,网上也有相关介绍.</p>
+<p>这里,简单记录一下使用步骤:</p>
+<p>1)安装:</p>
+<p>​    终端输入:</p>
+<p>​    brew install infer</p>
+<p>​    涉及到软件更新,依赖库安装,安装时间可能较长,具体依网络状况而定.</p>
+<p>2)使用:</p>
+<p>​    终端进入项目目录:</p>
+<p>​    $ cd &lt;项目所在目录&gt;</p>
+<p>​    使用如下命令编译:</p>
+<p>​    infer – xcodebuild -target 项目名 -configuration Debug -sdk iphonesimulator</p>
+<p>​    接下来终端中会出现日志信息打印.</p>
+<p>3)结果</p>
+<p>​    在项目所在目录出现 “build”及”infer-out”目录</p>
+<p>​    “infer-out”文件夹中有txt,json等相关文件,分析bugs.txt.</p>
+<p>4)再次使用</p>
+<p>​    由于infer有两种模式:增量与非增量模式</p>
+<p>​    a)增量模式:是在第一次运行 “2)中的编译命令” 后,产生了build和infer-out文件夹,</p>
+<p>​    再次执行该编译命令时,此时就是增量模式.当项目的代码没有改动时,则此时不会有编译结果, 如果项目代码有新的改动之处,此次编译就只产生新的编译结果.</p>
+<p>​    b)非增量模式:当再次执行编译命令前,删除了build和infer-out两个文件夹的时候,执行命令,则会输出所有的编译信息,相当于首次编译的情形.</p>
+<p>​    所以手动使用非增量模式的方法:</p>
+<p>​    一: 执行编译命令前,先删除build和infer-out文件夹(如果有的话)</p>
+<p>​    二: 在编译命令的最后追加”clean”, 即:</p>
+<p>​    xcodebuild -target 项目名称 -configuration Debug -sdk iphonesimulator clean</p>
+<p>​    对于infer静态分析的原理,感兴趣可以google一下.</p>
+]]></content>
       <categories>
-          
-          <category> 生活 </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 日常 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>开篇</title>
-      <link href="/2020/02/15/2020-2-15/"/>
-      <url>/2020/02/15/2020-2-15/</url>
-      
-        <content type="html"><![CDATA[<p>2020年开年的事,大家都知道了,目前仍然在经历着…</p><p>由于各方面政策的原因,一直宅着,那就找点事情捣鼓捣鼓吧:买了云主机,开了VPN,</p><p>订了网上课程…其实我只是想搭个个人博客,那么,这就是 2020年 的第一篇博文吧.</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>随笔一则</title>
+    <url>/2020/02/16/2020-2-16/</url>
+    <content><![CDATA[<p>​    昨晚外面还在风雨交加,今天就是个大太阳,就是温度有点低.</p>
+<p>​    看今天的网络,仿佛一场自发的摄影大赛,各种抓拍的雪景,虽说疫情当前,但这场短暂的春雪还是给广大网友们带来了一丝快乐,毕竟大家都在家憋坏了……</p>
+<p>​    昨晚还看到东南亚一些国家发出了”放弃疫情防治措施”的新闻,貌似那边就是百姓该吃吃该喝喝,社会正常运作的意思,想来疫情程度不同,号称新冠病杀伤力不如Sara,于是放弃抵抗?!</p>
+<p>​    昨晚西甲的一场比赛,赛前为”中国加油,武汉加油”的仪式还是挺暖心的…咱武汉同胞要加油!</p>
+<p>​    </p>
+<p>​    </p>
+]]></content>
       <categories>
-          
-          <category> 生活 </category>
-          
+        <category>生活</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 日常 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-  
-  
+      <tags>
+        <tag>日常</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>开篇</title>
+    <url>/2020/02/15/2020-2-15/</url>
+    <content><![CDATA[<p>2020年开年的事,大家都知道了,目前仍然在经历着…</p>
+<p>由于各方面政策的原因,一直宅着,那就找点事情捣鼓捣鼓吧:买了云主机,开了VPN,</p>
+<p>订了网上课程…其实我只是想搭个个人博客,那么,这就是 2020年 的第一篇博文吧.</p>
+]]></content>
+      <categories>
+        <category>生活</category>
+      </categories>
+      <tags>
+        <tag>日常</tag>
+      </tags>
+  </entry>
 </search>
