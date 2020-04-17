@@ -2,20 +2,38 @@
 <search>
   <entry>
     <title>Lottie动画框架的简单使用</title>
-    <url>/2020/04/17/2020-4-11/</url>
+    <url>/2020/04/11/2020-4-11/</url>
     <content><![CDATA[<p>Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.</p>
 <p>和平时iOS开发中用一行行代码编写的动画不同, lottie动画框架是由专业的动画设计师设计的.</p>
 <p>然后通过Bodymovin插件进行导出,导出的文件为json文件.</p>
-<figure class="highlight django"><table><tr><td class="code"><pre><span class="line"><span class="template-tag">&#123;% <span class="name">blockquote</span> Lottie官方平台网站 https://lottiefiles.com Lottie官方平台网站 %&#125;</span></span><br><span class="line"><span class="template-tag">&#123;% <span class="name">endblockquote</span> %&#125;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight dts"><table><tr><td class="code"><pre><span class="line">Lottie官方平台网站</span><br><span class="line"><span class="symbol">https:</span><span class="comment">//lottiefiles.com</span></span><br></pre></td></tr></table></figure>
-
+<p>Lottie官方平台网站:</p>
+<p><a href="https://lottiefiles.com" target="_blank" rel="noopener">https://lottiefiles.com</a></p>
 <p>其原理是将通过由After Effects设计编辑的动画效果,通过json,来映射到iOS相应的动画变换类的属性中,通过CoreAnimation进行动画渲染. 相比手动写动画代码,直接导入json文件着实方便不少.</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">Loading</span>动画<span class="selector-class">.gif</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/Users/Yong/Downloads/Loading%E5%8A%A8%E7%94%BB.gif" alt="Loading动画"></p>
 <p>使用步骤如下:</p>
 <p>通过CocoaPods集成Lottie框架</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#pod &#39;lottie-ios&#39;, &#39;~&gt; 3.1.6&#39;#For Swift</span><br><span class="line">pod &#39;lottie-ios&#39;, &#39;~&gt; 2.5.3&#39;#For OC</span><br></pre></td></tr></table></figure>
 
+<p>然后可以尝试在Lottie网站上下载一个json动画文件,拖入到工程中,再将json文件名写入代码中,示例如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">LOTAnimationView * animationView &#x3D; [LOTAnimationView animationNamed:@&quot;222-trail-loading&quot;];</span><br><span class="line">animationView.loopAnimation &#x3D; YES;</span><br><span class="line">animationView.frame &#x3D; self.view.bounds;</span><br><span class="line">[self.view addSubview:animationView];</span><br><span class="line">[animationView playWithCompletion:^(BOOL animationFinished) &#123;</span><br><span class="line">    &#x2F;&#x2F;动画完成后执行</span><br><span class="line">    &#x2F;&#x2F;当loopAnimation &#x3D; YES时,循环播放的时候不执行</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>Lottie还有一些其他的属性,如手势联动动画,配合LOTAnimationView 的 animationProgress 属性进行控制;</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@property (nonatomic, readonly) BOOL isAnimationPlaying;&#x2F;&#x2F;判断动画是否在播放</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) BOOL loopAnimation;&#x2F;&#x2F;是否要循环播放动画</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) CGFloat animationProgress;&#x2F;&#x2F;自定义动画的播放进度</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) CGFloat animationSpeed;&#x2F;&#x2F;自定义动画的播放速度</span><br><span class="line"></span><br><span class="line">@property (nonatomic, readonly) CGFloat animationDuration;&#x2F;&#x2F;自定义动画的播放时长</span><br></pre></td></tr></table></figure>
+
+<p>Lottie也支持自定义页面切换的过场动画,通过设置 present／dismiss controller 转场动画, 在需要转场效果的VC中实现UIViewControllerTransitioningDelegate代理中下面的两个方法:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">#pragma mark -- 定制转场动画</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 代理返回推出控制器的动画</span><br><span class="line">- (id&lt;UIViewControllerAnimatedTransitioning&gt;)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source &#123;</span><br><span class="line">  LOTAnimationTransitionController *animationController &#x3D; [[LOTAnimationTransitionController alloc] initWithAnimationNamed:@&quot;转场动画json名1&quot; fromLayerNamed:@&quot;来自哪个图层的图层名1&quot; toLayerNamed:@&quot;去到哪个图层的图层名1&quot; applyAnimationTransform:NO];</span><br><span class="line">  return animationController;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 代理返回退出控制器的动画</span><br><span class="line">- (id&lt;UIViewControllerAnimatedTransitioning&gt;)animationControllerForDismissedController:(UIViewController *)dismissed &#123;</span><br><span class="line">  LOTAnimationTransitionController *animationController &#x3D; [[LOTAnimationTransitionController alloc] initWithAnimationNamed:@&quot;转场动画json名2&quot; fromLayerNamed:@&quot;来自哪个图层的图层名2&quot; toLayerNamed:@&quot;去到哪个图层的图层名2&quot; applyAnimationTransform:NO];</span><br><span class="line">  return animationController;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;后两个属性fromLayerNamed,toLayerNamed 可不填</span><br></pre></td></tr></table></figure>
+
+<p>最后附上Lottie的iOS/Mac版官方教程地址:</p>
+<p><a href="http://airbnb.io/lottie/#/ios" target="_blank" rel="noopener">http://airbnb.io/lottie/#/ios</a></p>
 ]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
   </entry>
   <entry>
     <title>App耗电量检测</title>
