@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-04-16T11:38:00.373Z</updated>
+  <updated>2020-04-17T06:03:43.609Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -17,9 +17,33 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Lottie动画框架的简单使用</title>
+    <link href="https://wickyong.github.io/2020/04/17/2020-4-11/"/>
+    <id>https://wickyong.github.io/2020/04/17/2020-4-11/</id>
+    <published>2020-04-17T05:38:51.000Z</published>
+    <updated>2020-04-17T06:03:43.609Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.&lt;/p&gt;
+&lt;p&gt;和平时iOS开发中用一行行代码编写的动画不同,
+        
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>App耗电量检测</title>
-    <link href="https://wickyong.github.io/2020/04/05/4-5/"/>
-    <id>https://wickyong.github.io/2020/04/05/4-5/</id>
+    <link href="https://wickyong.github.io/2020/04/05/2020-4-5/"/>
+    <id>https://wickyong.github.io/2020/04/05/2020-4-5/</id>
     <published>2020-04-05T11:08:53.000Z</published>
     <updated>2020-04-16T11:38:00.373Z</updated>
     
@@ -46,8 +70,8 @@
   
   <entry>
     <title>iOS中获取内存值的方法</title>
-    <link href="https://wickyong.github.io/2020/03/31/3-31/"/>
-    <id>https://wickyong.github.io/2020/03/31/3-31/</id>
+    <link href="https://wickyong.github.io/2020/03/31/2020-3-31/"/>
+    <id>https://wickyong.github.io/2020/03/31/2020-3-31/</id>
     <published>2020-03-31T08:01:06.000Z</published>
     <updated>2020-04-16T11:38:19.265Z</updated>
     
@@ -75,8 +99,8 @@
   
   <entry>
     <title>利用RunLoop监控卡顿</title>
-    <link href="https://wickyong.github.io/2020/03/28/3-28/"/>
-    <id>https://wickyong.github.io/2020/03/28/3-28/</id>
+    <link href="https://wickyong.github.io/2020/03/28/2020-3-28/"/>
+    <id>https://wickyong.github.io/2020/03/28/2020-3-28/</id>
     <published>2020-03-28T01:42:49.000Z</published>
     <updated>2020-04-16T08:00:37.263Z</updated>
     
