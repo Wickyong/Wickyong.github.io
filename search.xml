@@ -3,9 +3,7 @@
   <entry>
     <title>iOS底层探秘之isa</title>
     <url>/2020/09/10/2020-9-10/</url>
-    <content><![CDATA[<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">[TOC]</span><br></pre></td></tr></table></figure>
-
-<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
+    <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
 <p><img src="isa_t.png" alt=""></p>
 <p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体. (什么是联合体?)</p>
 <h3 id="二-iSA的结构"><a href="#二-iSA的结构" class="headerlink" title="二. iSA的结构"></a>二. iSA的结构</h3><p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p>
