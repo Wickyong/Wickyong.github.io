@@ -4,7 +4,8 @@
     <title>iOS底层探秘之isa(前篇)</title>
     <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
     <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
-<p><img src="isa_t.png" alt=""></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"isa.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">isa_t</span> &#123;</span><br><span class="line">    <span class="keyword">isa_t</span>() &#123; &#125;</span><br><span class="line">    <span class="keyword">isa_t</span>(<span class="keyword">uintptr_t</span> value) : bits(value) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    Class cls;</span><br><span class="line">    <span class="keyword">uintptr_t</span> bits;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(ISA_BITFIELD)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        ISA_BITFIELD;  <span class="comment">// defined in isa.h</span></span><br><span class="line">    &#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体.</p>
 <p>什么是联合体?</p>
 <p>当多个数据需要共享内存或者多个数据每次只取其一时，可以利用联合体(union)。在C Programming Language 一书中对于联合体是这么描述的：</p>
