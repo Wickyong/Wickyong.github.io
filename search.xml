@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>iOS底层探秘之isa(前篇)</title>
+    <title>iOS底层探秘之isa</title>
     <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
     <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
 <p><img src="isa_t.png" alt=""></p>
@@ -33,6 +33,12 @@
 <p>那么isa具体是怎么运行的呢?</p>
 <p>未完待续…</p>
 ]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>底层原理</tag>
+      </tags>
   </entry>
   <entry>
     <title>Lottie动画框架的简单使用</title>
