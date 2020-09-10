@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>探索&quot;离屏渲染&quot;</title>
-    <url>/2020/07/07/2020-7-7/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>视觉</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Lottie动画框架的简单使用</title>
     <url>/2020/04/11/2020-4-11/</url>
     <content><![CDATA[<p>Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.</p>
