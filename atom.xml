@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-04-17T07:33:32.194Z</updated>
+  <updated>2020-07-08T09:01:36.378Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>探索&quot;离屏渲染&quot;</title>
+    <link href="https://wickyong.github.io/2020/07/07/2020-7-7/"/>
+    <id>https://wickyong.github.io/2020/07/07/2020-7-7/</id>
+    <published>2020-07-07T14:24:23.000Z</published>
+    <updated>2020-07-08T09:01:36.378Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+      <category term="iOS" scheme="https://Wickyong.github.io/categories/iOS/"/>
+    
+    
+      <category term="视觉" scheme="https://Wickyong.github.io/tags/%E8%A7%86%E8%A7%89/"/>
+    
+  </entry>
   
   <entry>
     <title>Lottie动画框架的简单使用</title>
