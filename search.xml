@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>iOS底层探秘之isa(前篇)</title>
+    <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
+    <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
+<p><img src="iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87" alt="d3c3eab320792c949e90dabfd78bca52">.resources/截屏2020-09-10 下午5.05.31.png)</p>
+<p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体.</p>
+<p>什么是联合体?</p>
+<p>当多个数据需要共享内存或者多个数据每次只取其一时，可以利用联合体(union)。在C Programming Language 一书中对于联合体是这么描述的：</p>
+<p>   1)联合体是一个结构；</p>
+<p>   2)它的所有成员相对于基地址的偏移量都为0；</p>
+<p>   3)此结构空间要大到足够容纳最”宽”的成员；</p>
+<p>   4)其对齐方式要适合其中所有的成员；</p>
+<h3 id="二-iSA的结构"><a href="#二-iSA的结构" class="headerlink" title="二. iSA的结构"></a>二. iSA的结构</h3><p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p>
+<p>什么是位域?</p>
+<p>位域指信息在存储时，并不需要占用一个完整的字节， 而只需占几个或一个二进制位。例如在存放一个开关量时，只有0和1 两种状态， 用一位二进位即可。为了节省存储空间，并使处理简便，C语言又提供了一种数据结构，称为“位域”或“位段”。所谓“位域”是把一个字节中的二进位划分为几 个不同的区域， 并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。 这样就可以把几个不同的对象用一个字节的二进制位域来表示。</p>
+<p>其中ISA_BITFIELD在不同环境下有不同定义:</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta"># <span class="meta-keyword">if</span> __arm64__</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MASK        0x0000000ffffffff8ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_MASK  0x000003f000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_VALUE 0x000001a000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_BITFIELD                                                      \</span></span><br><span class="line">      <span class="keyword">uintptr_t</span> nonpointer        : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_assoc         : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_cxx_dtor      : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> shiftcls          : <span class="number">33</span>; <span class="comment">/*MACH_VM_MAX_ADDRESS 0x1000000000*/</span> \</span><br><span class="line">      <span class="keyword">uintptr_t</span> magic             : <span class="number">6</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> weakly_referenced : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> deallocating      : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_sidetable_rc  : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> extra_rc          : <span class="number">19</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_ONE   (1ULL&lt;&lt;45)</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_HALF  (1ULL&lt;&lt;18)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">elif</span> __x86_64__</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MASK        0x00007ffffffffff8ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_MASK  0x001f800000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_VALUE 0x001d800000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_BITFIELD                                                        \</span></span><br><span class="line">      <span class="keyword">uintptr_t</span> nonpointer        : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_assoc         : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_cxx_dtor      : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> shiftcls          : <span class="number">44</span>; <span class="comment">/*MACH_VM_MAX_ADDRESS 0x7fffffe00000*/</span> \</span><br><span class="line">      <span class="keyword">uintptr_t</span> magic             : <span class="number">6</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> weakly_referenced : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> deallocating      : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_sidetable_rc  : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> extra_rc          : <span class="number">8</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_ONE   (1ULL&lt;&lt;56)</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_HALF  (1ULL&lt;&lt;7)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">error</span> unknown architecture for packed isa</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="三-ISA-BITFIELD参数分析"><a href="#三-ISA-BITFIELD参数分析" class="headerlink" title="三. ISA_BITFIELD参数分析"></a>三. ISA_BITFIELD参数分析</h3><p><img src="iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87" alt="70ac54022b7b6ad89d633df480b0ab6b">.resources/截屏2020-09-10 下午4.56.17.png)</p>
+<p>(上图对应 arm64 架构)</p>
+<p>nonpointer：表示是否对 isa 指针开启指针优化. 0：纯isa指针，1：不⽌是类对象地址,isa 中包含了类信息、对象的引⽤计数等</p>
+<p>has_assoc：关联对象标志位，0没有，1存在</p>
+<p>has_cxx_dtor：该对象是否有 C++ 或者 Objc 的析构器,如果有析构函数,则需要做析构逻辑,<br>如果没有,则可以更快的释放对象</p>
+<p>shiftcls:<br>存储类指针的值。开启指针优化的情况下，在 arm64 架构中有 33 位⽤来存储类指针。</p>
+<p>magic：⽤于调试器判断当前对象是真的对象还是没有初始化的空间</p>
+<p>weakly_referenced：标志对象是否被指向或者曾经指向⼀个 ARC 的弱变量，没有弱引⽤的对象可以更快释放。</p>
+<p>deallocating：标志对象是否正在释放内存</p>
+<p>has_sidetable_rc：当对象引⽤计数值⼤于 10 时，则需要借⽤该变量存储进位</p>
+<p>extra_rc：当表示该对象的引⽤计数值，实际上是引⽤计数值减 1，例如，如果对象的引⽤计数为 10，那么 extra_rc 为 9。如果引⽤计数⼤于 10，则需要使⽤到下⾯的 has_sidetable_rc。</p>
+<p>那么isa具体是怎么运行的呢?</p>
+<p>未完待续…</p>
+]]></content>
+  </entry>
+  <entry>
     <title>iOS底层探秘之isa</title>
     <url>/2020/09/10/2020-9-10/</url>
     <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
