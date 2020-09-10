@@ -1,6 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>iOS底层探秘之isa</title>
+    <url>/2020/09/10/2020-9-10/</url>
+    <content><![CDATA[<p>### 一. iSA是什么?</p>
+<p>从源码可知:</p>
+<p><img src="evernotecid://A9939E99-54B6-4194-89AA-064B5D483660/appyinxiangcom/15040195/ENResource/p4165" alt="d3c3eab320792c949e90dabfd78bca52.png"></p>
+<p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体. (什么是联合体?)</p>
+<p>### 二. iSA的结构</p>
+<p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p>
+<p>什么是位域?</p>
+<p>位域指信息在存储时，并不需要占用一个完整的字节， 而只需占几个或一个二进制位。例如在存放一个开关量时，只有0和1 两种状态， 用一位二进位即可。为了节省存储空间，并使处理简便，C语言又提供了一种数据结构，称为“位域”或“位段”。所谓“位域”是把一个字节中的二进位划分为几 个不同的区域， 并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。 这样就可以把几个不同的对象用一个字节的二进制位域来表示。</p>
+<p>其中ISA_BITFIELD在不同环境下有不同定义:</p>
+<p>```c</p>
+<p># if <strong>arm64</strong></p>
+<p># define ISA_MASK 0x0000000ffffffff8ULL</p>
+<p># define ISA_MAGIC_MASK 0x000003f000000001ULL</p>
+<p># define ISA_MAGIC_VALUE 0x000001a000000001ULL</p>
+<p># define ISA_BITFIELD \</p>
+<p>uintptr_t nonpointer : 1; \</p>
+<p>uintptr_t has_assoc : 1; \</p>
+<p>uintptr_t has_cxx_dtor : 1; \</p>
+<p>uintptr_t shiftcls : 33; /<em>MACH_VM_MAX_ADDRESS 0x1000000000</em>/ \</p>
+<p>uintptr_t magic : 6; \</p>
+<p>uintptr_t weakly_referenced : 1; \</p>
+<p>uintptr_t deallocating : 1; \</p>
+<p>uintptr_t has_sidetable_rc : 1; \</p>
+<p>uintptr_t extra_rc : 19</p>
+<p># define RC_ONE (1ULL&lt;&lt;45)</p>
+<p># define RC_HALF (1ULL&lt;&lt;18)</p>
+<p># elif <strong>x86_64</strong></p>
+<p># define ISA_MASK 0x00007ffffffffff8ULL</p>
+<p># define ISA_MAGIC_MASK 0x001f800000000001ULL</p>
+<p># define ISA_MAGIC_VALUE 0x001d800000000001ULL</p>
+<p># define ISA_BITFIELD \</p>
+<p>uintptr_t nonpointer : 1; \</p>
+<p>uintptr_t has_assoc : 1; \</p>
+<p>uintptr_t has_cxx_dtor : 1; \</p>
+<p>uintptr_t shiftcls : 44; /<em>MACH_VM_MAX_ADDRESS 0x7fffffe00000</em>/ \</p>
+<p>uintptr_t magic : 6; \</p>
+<p>uintptr_t weakly_referenced : 1; \</p>
+<p>uintptr_t deallocating : 1; \</p>
+<p>uintptr_t has_sidetable_rc : 1; \</p>
+<p>uintptr_t extra_rc : 8</p>
+<p># define RC_ONE (1ULL&lt;&lt;56)</p>
+<p># define RC_HALF (1ULL&lt;&lt;7)</p>
+<p># else</p>
+<p># error unknown architecture for packed isa</p>
+<p># endif</p>
+<p>```</p>
+<p>### 三. ISA_BITFIELD参数分析</p>
+<p><img src="evernotecid://A9939E99-54B6-4194-89AA-064B5D483660/appyinxiangcom/15040195/ENResource/p4159" alt="70ac54022b7b6ad89d633df480b0ab6b.png"></p>
+<p>(上图对应 arm64 架构)</p>
+<p>nonpointer：表示是否对 isa 指针开启指针优化. 0：纯isa指针，1：不⽌是类对象地址,isa 中包含了类信息、对象的引⽤计数等</p>
+<p>has_assoc：关联对象标志位，0没有，1存在</p>
+<p>has_cxx_dtor：该对象是否有 C++ 或者 Objc 的析构器,如果有析构函数,则需要做析构逻辑,</p>
+<p>如果没有,则可以更快的释放对象</p>
+<p>shiftcls:</p>
+<p>存储类指针的值。开启指针优化的情况下，在 arm64 架构中有 33 位⽤来存储类指针。</p>
+<p>magic：⽤于调试器判断当前对象是真的对象还是没有初始化的空间</p>
+<p>weakly_referenced：标志对象是否被指向或者曾经指向⼀个 ARC 的弱变量，没有弱引⽤的对象可以更快释放。</p>
+<p>deallocating：标志对象是否正在释放内存</p>
+<p>has_sidetable_rc：当对象引⽤计数值⼤于 10 时，则需要借⽤该变量存储进位</p>
+<p>extra_rc：当表示该对象的引⽤计数值，实际上是引⽤计数值减 1，例如，如果对象的引⽤计数为 10，那么 extra_rc 为 9。如果引⽤计数⼤于 10，则需要使⽤到下⾯的 has_sidetable_rc。</p>
+<p>那么isa具体是怎么运行的呢?</p>
+<p>未完待续…</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Lottie动画框架的简单使用</title>
     <url>/2020/04/11/2020-4-11/</url>
     <content><![CDATA[<p>Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.</p>
@@ -181,7 +254,7 @@
 <p>……暂时写这么多吧</p>
 ]]></content>
       <categories>
-        <category>通用</category>
+        <category>工具</category>
       </categories>
       <tags>
         <tag>开发工具</tag>
