@@ -3,54 +3,20 @@
   <entry>
     <title>iOS底层探秘之isa</title>
     <url>/2020/09/10/2020-9-10/</url>
-    <content><![CDATA[<p>### 一. iSA是什么?</p>
-<p>从源码可知:</p>
+    <content><![CDATA[<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">[TOC]</span><br></pre></td></tr></table></figure>
+
+<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
 <p><img src="isa_t.png" alt=""></p>
 <p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体. (什么是联合体?)</p>
-<p>### 二. iSA的结构</p>
-<p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p>
+<h3 id="二-iSA的结构"><a href="#二-iSA的结构" class="headerlink" title="二. iSA的结构"></a>二. iSA的结构</h3><p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p>
 <p>什么是位域?</p>
 <p>位域指信息在存储时，并不需要占用一个完整的字节， 而只需占几个或一个二进制位。例如在存放一个开关量时，只有0和1 两种状态， 用一位二进位即可。为了节省存储空间，并使处理简便，C语言又提供了一种数据结构，称为“位域”或“位段”。所谓“位域”是把一个字节中的二进位划分为几 个不同的区域， 并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。 这样就可以把几个不同的对象用一个字节的二进制位域来表示。</p>
 <p>其中ISA_BITFIELD在不同环境下有不同定义:</p>
-<p>```c</p>
-<p># if <strong>arm64</strong></p>
-<p># define ISA_MASK 0x0000000ffffffff8ULL</p>
-<p># define ISA_MAGIC_MASK 0x000003f000000001ULL</p>
-<p># define ISA_MAGIC_VALUE 0x000001a000000001ULL</p>
-<p># define ISA_BITFIELD \</p>
-<p>uintptr_t nonpointer : 1; \</p>
-<p>uintptr_t has_assoc : 1; \</p>
-<p>uintptr_t has_cxx_dtor : 1; \</p>
-<p>uintptr_t shiftcls : 33; /<em>MACH_VM_MAX_ADDRESS 0x1000000000</em>/ \</p>
-<p>uintptr_t magic : 6; \</p>
-<p>uintptr_t weakly_referenced : 1; \</p>
-<p>uintptr_t deallocating : 1; \</p>
-<p>uintptr_t has_sidetable_rc : 1; \</p>
-<p>uintptr_t extra_rc : 19</p>
-<p># define RC_ONE (1ULL&lt;&lt;45)</p>
-<p># define RC_HALF (1ULL&lt;&lt;18)</p>
-<p># elif <strong>x86_64</strong></p>
-<p># define ISA_MASK 0x00007ffffffffff8ULL</p>
-<p># define ISA_MAGIC_MASK 0x001f800000000001ULL</p>
-<p># define ISA_MAGIC_VALUE 0x001d800000000001ULL</p>
-<p># define ISA_BITFIELD \</p>
-<p>uintptr_t nonpointer : 1; \</p>
-<p>uintptr_t has_assoc : 1; \</p>
-<p>uintptr_t has_cxx_dtor : 1; \</p>
-<p>uintptr_t shiftcls : 44; /<em>MACH_VM_MAX_ADDRESS 0x7fffffe00000</em>/ \</p>
-<p>uintptr_t magic : 6; \</p>
-<p>uintptr_t weakly_referenced : 1; \</p>
-<p>uintptr_t deallocating : 1; \</p>
-<p>uintptr_t has_sidetable_rc : 1; \</p>
-<p>uintptr_t extra_rc : 8</p>
-<p># define RC_ONE (1ULL&lt;&lt;56)</p>
-<p># define RC_HALF (1ULL&lt;&lt;7)</p>
-<p># else</p>
-<p># error unknown architecture for packed isa</p>
-<p># endif</p>
-<p>```</p>
-<p>### 三. ISA_BITFIELD参数分析</p>
-<p><img src="arm64.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\# if __arm64__</span><br><span class="line"></span><br><span class="line">\# define ISA_MASK 0x0000000ffffffff8ULL</span><br><span class="line"></span><br><span class="line">\# define ISA_MAGIC_MASK 0x000003f000000001ULL</span><br><span class="line"></span><br><span class="line">\# define ISA_MAGIC_VALUE 0x000001a000000001ULL</span><br><span class="line"></span><br><span class="line">\# define ISA_BITFIELD \</span><br><span class="line"></span><br><span class="line">uintptr_t nonpointer : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t has_assoc : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t has_cxx_dtor : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t shiftcls : 33; &#x2F;*MACH_VM_MAX_ADDRESS 0x1000000000*&#x2F; \</span><br><span class="line"></span><br><span class="line">uintptr_t magic : 6; \</span><br><span class="line"></span><br><span class="line">uintptr_t weakly_referenced : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t deallocating : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t has_sidetable_rc : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t extra_rc : 19</span><br><span class="line"></span><br><span class="line">\# define RC_ONE (1ULL&lt;&lt;45)</span><br><span class="line"></span><br><span class="line">\# define RC_HALF (1ULL&lt;&lt;18)</span><br><span class="line"></span><br><span class="line">\# elif __x86_64__</span><br><span class="line"></span><br><span class="line">\# define ISA_MASK 0x00007ffffffffff8ULL</span><br><span class="line"></span><br><span class="line">\# define ISA_MAGIC_MASK 0x001f800000000001ULL</span><br><span class="line"></span><br><span class="line">\# define ISA_MAGIC_VALUE 0x001d800000000001ULL</span><br><span class="line"></span><br><span class="line">\# define ISA_BITFIELD \</span><br><span class="line"></span><br><span class="line">uintptr_t nonpointer : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t has_assoc : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t has_cxx_dtor : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t shiftcls : 44; &#x2F;*MACH_VM_MAX_ADDRESS 0x7fffffe00000*&#x2F; \</span><br><span class="line"></span><br><span class="line">uintptr_t magic : 6; \</span><br><span class="line"></span><br><span class="line">uintptr_t weakly_referenced : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t deallocating : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t has_sidetable_rc : 1; \</span><br><span class="line"></span><br><span class="line">uintptr_t extra_rc : 8</span><br><span class="line"></span><br><span class="line">\# define RC_ONE (1ULL&lt;&lt;56)</span><br><span class="line"></span><br><span class="line">\# define RC_HALF (1ULL&lt;&lt;7)</span><br><span class="line"></span><br><span class="line">\# else</span><br><span class="line"></span><br><span class="line">\# error unknown architecture for packed isa</span><br><span class="line"></span><br><span class="line">\# endif</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="三-ISA-BITFIELD参数分析"><a href="#三-ISA-BITFIELD参数分析" class="headerlink" title="三. ISA_BITFIELD参数分析"></a>三. ISA_BITFIELD参数分析</h3><p><img src="arm64.png" alt=""></p>
 <p>(上图对应 arm64 架构)</p>
 <p>nonpointer：表示是否对 isa 指针开启指针优化. 0：纯isa指针，1：不⽌是类对象地址,isa 中包含了类信息、对象的引⽤计数等</p>
 <p>has_assoc：关联对象标志位，0没有，1存在</p>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://wickyong.github.io/"/>
-  <updated>2020-09-10T09:11:23.013Z</updated>
+  <updated>2020-09-10T09:22:51.333Z</updated>
   <id>https://wickyong.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://wickyong.github.io/2020/09/10/2020-9-10/"/>
     <id>https://wickyong.github.io/2020/09/10/2020-9-10/</id>
     <published>2020-09-10T08:00:51.000Z</published>
-    <updated>2020-09-10T09:11:23.013Z</updated>
+    <updated>2020-09-10T09:22:51.333Z</updated>
     
     <summary type="html">
     
@@ -29,10 +29,7 @@
       
         
         
-          &lt;p&gt;### 一. iSA是什么?&lt;/p&gt;
-&lt;p&gt;从源码可知:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;isa_t.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体.
+          &lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td
         
       
     
