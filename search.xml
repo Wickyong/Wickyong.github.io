@@ -1,6 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>iOS底层探秘之objc_msgSend流程</title>
+    <url>/2020/09/21/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bobjc_msgSend%E6%B5%81%E7%A8%8B/</url>
+    <content><![CDATA[<p>-–</p>
+<p>title: iOS底层探秘之objc_msgSend流程</p>
+<p>date: 2020-09-21 16:00:51</p>
+<p>categories:</p>
+<p>- iOS</p>
+<p>tags:</p>
+<p>- 底层原理</p>
+<h3 id="一-编译和运行时"><a href="#一-编译和运行时" class="headerlink" title="一.编译和运行时"></a>一.编译和运行时</h3><h4 id="编译-顾名思义就是正在编译的时候"><a href="#编译-顾名思义就是正在编译的时候" class="headerlink" title="编译:顾名思义就是正在编译的时候"></a>编译:顾名思义就是正在编译的时候</h4><p>  那啥叫编译呢?就是编译器帮你把源代码翻译成机器能识别的代码.(当然只是⼀般意义上这么说,实际上可能只是翻译成某个中间状态的语⾔.)</p>
+<p>  那编译时就是简单的作⼀些翻译⼯作 ,⽐如检查⽼兄你有没有粗⼼写错啥关键字了啊.有啥词法分析,语法分析之类的过程. 就像个⽼师检查学⽣的作⽂中有没有错别字和病句⼀样 .如果发现啥错误编译器就告诉你.如果你⽤微软的VS的话,点下build.那就开始编译,如果下⾯有errors或者warning信息,那都是编译器检查出来的.所谓这时的错误就叫编译时错误,这个过程中做的啥类型检查也就叫编译<br>时类型检查,或静态类型检查(所谓静态嘛就是没把真把代码放内存中运⾏起来,⽽只是把代码当作⽂本来扫描下). 所以有时⼀些⼈说编译时还分配内存啥的肯定是错误的说法.</p>
+<h4 id="运行时-就是代码跑起来了-被装载到内存中去了"><a href="#运行时-就是代码跑起来了-被装载到内存中去了" class="headerlink" title="运行时:就是代码跑起来了.被装载到内存中去了"></a>运行时:就是代码跑起来了.被装载到内存中去了</h4><p>  你的代码保存在磁盘上没装⼊内存之前是个死家伙.只有跑到内存中才变成活的).⽽运⾏时类型检查就与前⾯讲的编译时类型检查(或者静态类型检查)不⼀样.不是简单的扫描代码.⽽是在内存中做些操作,做些判断.</p>
+<h3 id="二-OC中的Runtime"><a href="#二-OC中的Runtime" class="headerlink" title="二.OC中的Runtime"></a>二.OC中的Runtime</h3><h4 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h4><p>  Runtime有两个版本 ⼀个Legacy版本(早期版本) ，⼀个Modern版本(现⾏版本)</p>
+<ul>
+<li>早期版本对应的编程接⼝:Objective-C 1.0 </li>
+<li>现⾏版本对应的编程接⼝:Objective-C 2.0 </li>
+<li>早期版本⽤于Objective-C 1.0, 32位的Mac OS X的平台上</li>
+<li>现⾏版本:iPhone程序和Mac OS X v10.5 及以后的系统中的 64 位程序</li>
+</ul>
+<p><a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Objective-C Runtime Programming Guide</a></p>
+<h4 id="如何调用"><a href="#如何调用" class="headerlink" title="如何调用"></a>如何调用</h4><ul>
+<li>Objective-C Code</li>
+<li>FrameWork&amp;Service</li>
+<li>Runtime API</li>
+</ul>
+<p><img src="runtime%E7%BB%93%E6%9E%84.png" alt=""></p>
+<h3 id="三-Objc-msgSend流程分析"><a href="#三-Objc-msgSend流程分析" class="headerlink" title="三.Objc_msgSend流程分析"></a>三.Objc_msgSend流程分析</h3><h4 id="方法的本质"><a href="#方法的本质" class="headerlink" title="方法的本质"></a>方法的本质</h4><p>从OC底层代码来看,方法的本质就是底层调用objc_msgSend消息发送方法</p>
+<h4 id="objc-msgSend"><a href="#objc-msgSend" class="headerlink" title="objc_msgSend"></a>objc_msgSend</h4><p>objc_msgSend是用汇编语言写的,原因是:</p>
+<ul>
+<li>在C语言中不可能通过写一个函数来保留未知的参数并且跳转到任意的函数指针,C语言没有满足做这件事的必要性</li>
+<li>汇编运行速度快</li>
+</ul>
+<h4 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h4><ol>
+<li><p>ENTRY_objc_msgSend</p>
+</li>
+<li><p>对消息接收者(id self, self_cmd) 判断处理</p>
+</li>
+<li><p>taggedPointer 判断处理</p>
+</li>
+<li><p>‘GetClassFromIsa_P16 isa’指针处理 - class</p>
+</li>
+<li><p>CacheLookup 查找缓存</p>
+</li>
+<li><p>‘cache_t’处理’bucket’以及内存哈希处理 </p>
+<ul>
+<li>找不到递归下一个’bucket’</li>
+<li>找到了就返回’{imp, sel} = * bucket -&gt; imp’</li>
+<li>遇到意外就重试</li>
+<li>找不到就’JumpMiss’</li>
+</ul>
+</li>
+<li><p>objc_msgSend_uncached 告知找不到缓存’imp’</p>
+</li>
+<li><p>‘STATIC_ENTRY__objc_msgSend_uncached’</p>
+</li>
+<li><p>‘MethodTableLookup’方法表查找</p>
+<ul>
+<li>‘save parameter registers’</li>
+<li>‘self’ 以及_cmd准备</li>
+<li>‘class_lookupMethodAndLoadCache3’调用</li>
+</ul>
+</li>
+</ol>
+<p>至此,快速查找缓存流程结束.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">graph TD</span><br><span class="line">A[objc781_objc_msgSend] --&gt;B&#123;cmp p0,#0 判断接收者是否存在?&#125;</span><br><span class="line">B --&gt;|否| C[通过对象isa获取class]</span><br><span class="line">B --&gt;|是| D&#123;是否支持taggedpointer对象&#125;</span><br><span class="line">C --&gt; E[获取isa完毕LGetisaDone]</span><br><span class="line">D --&gt;|是| D1&#123;小对象或者空判断LNilOrTagged&#125;</span><br><span class="line">D --&gt;|否| D2[直接返回空 LReturnZero]</span><br><span class="line">D1 --&gt;|空| D2</span><br><span class="line">D1 --&gt;|小对象isa处理| E</span><br><span class="line">E --&gt; F[开启缓存查找流程CacheLookup NOEMAL]</span><br><span class="line">F --&gt; G[通过类的指针平移16得到cacheldr p11,x16,#CACHE]</span><br><span class="line">G --&gt; G1[通过获取到的mask_buckets掩码运算得到bucketsand p10,左中括号p11,#0x0000ffffffffffff右中括号]</span><br><span class="line">G --&gt; G2[通过逻辑右移得到maskp11.LSR #48]</span><br><span class="line">G3 --&gt; G[由于arm64 mask和buckets在一起]</span><br><span class="line">G2 --&gt; G21[通过and p12,p1 计算出哈希函数得到下标_cmd &amp; mask]</span><br><span class="line">G1 --&gt; H[p12 &#x3D; buckets + 左括号左括号_cmd &amp; mask右括号 &lt;&lt; 左括号1+PTRSHIFT右括号右括号]</span><br><span class="line">G21 --&gt; H</span><br><span class="line">H --&gt; I[通过bucket结构体得到 左花括号imp,sel右花括号 &#x3D; *bucket]</span><br><span class="line">I --&gt; J&#123;判断要查询的sel和当前_cmd是否相等&#125;</span><br><span class="line">J --&gt;|是| J1[命中缓存CacheHit $0]</span><br><span class="line">J --&gt; J2[如果从最后一个元素遍历过来还是找不到CheckMiss]</span><br><span class="line">J --&gt;|否| J3&#123;判断当前查询bucket是否为第一个元素 bucket&#x3D;&#x3D; buckets&#125;</span><br><span class="line">J3 --&gt;|是| J31[把当前查询bucket 设为最后一个元素 p12&#x3D;buckets + 左括号mask &lt;&lt; 1+PTRSHIFT右括号]</span><br><span class="line">J3 --&gt;|否| J32[向前查找 左花括号imp,sel右花括号 &#x3D; *--bucket]</span><br><span class="line">J31 --&gt; J32</span><br></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
     <title>iOS底层探秘之isa(前篇)</title>
     <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
     <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
