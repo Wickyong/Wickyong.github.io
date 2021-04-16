@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Flutter与iOS的混合开发</title>
-    <url>/Blog/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/</url>
+    <url>/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/</url>
     <content><![CDATA[<h3 id="FLutter与iOS混合开发的三种方式"><a href="#FLutter与iOS混合开发的三种方式" class="headerlink" title="FLutter与iOS混合开发的三种方式"></a>FLutter与iOS混合开发的三种方式</h3><h4 id="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"><a href="#本文记载了原生iOS项目下集成Flutter的混合开发的三种方式" class="headerlink" title="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"></a>本文记载了原生iOS项目下集成Flutter的混合开发的三种方式</h4><p>以下均以示例说明：<br>环境说明: Macbook air M1，iPhone X</p>
 <h5 id="原生嵌套Flutter-Module"><a href="#原生嵌套Flutter-Module" class="headerlink" title="原生嵌套Flutter Module"></a>原生嵌套Flutter Module</h5><p>步骤：</p>
 <ol>
@@ -58,7 +58,7 @@
   </entry>
   <entry>
     <title>iOS底层探秘之objc_msgSend流程</title>
-    <url>/Blog/2020/09/21/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bobjc_msgSend%E6%B5%81%E7%A8%8B/</url>
+    <url>/2020/09/21/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bobjc_msgSend%E6%B5%81%E7%A8%8B/</url>
     <content><![CDATA[<h3 id="一-编译和运行时"><a href="#一-编译和运行时" class="headerlink" title="一.编译和运行时"></a>一.编译和运行时</h3><h4 id="编译-顾名思义就是正在编译的时候"><a href="#编译-顾名思义就是正在编译的时候" class="headerlink" title="编译:顾名思义就是正在编译的时候"></a>编译:顾名思义就是正在编译的时候</h4><p>  那啥叫编译呢?就是编译器帮你把源代码翻译成机器能识别的代码.(当然只是⼀般意义上这么说,实际上可能只是翻译成某个中间状态的语⾔.)</p>
 <p>  那编译时就是简单的作⼀些翻译⼯作 ,⽐如检查⽼兄你有没有粗⼼写错啥关键字了啊.有啥词法分析,语法分析之类的过程. 就像个⽼师检查学⽣的作⽂中有没有错别字和病句⼀样 .如果发现啥错误编译器就告诉你.如果你⽤微软的VS的话,点下build.那就开始编译,如果下⾯有errors或者warning信息,那都是编译器检查出来的.所谓这时的错误就叫编译时错误,这个过程中做的啥类型检查也就叫编译<br>时类型检查,或静态类型检查(所谓静态嘛就是没把真把代码放内存中运⾏起来,⽽只是把代码当作⽂本来扫描下). 所以有时⼀些⼈说编译时还分配内存啥的肯定是错误的说法.</p>
 <h4 id="运行时-就是代码跑起来了-被装载到内存中去了"><a href="#运行时-就是代码跑起来了-被装载到内存中去了" class="headerlink" title="运行时:就是代码跑起来了.被装载到内存中去了"></a>运行时:就是代码跑起来了.被装载到内存中去了</h4><p>  你的代码保存在磁盘上没装⼊内存之前是个死家伙.只有跑到内存中才变成活的).⽽运⾏时类型检查就与前⾯讲的编译时类型检查(或者静态类型检查)不⼀样.不是简单的扫描代码.⽽是在内存中做些操作,做些判断.</p>
@@ -124,7 +124,7 @@
   </entry>
   <entry>
     <title>iOS底层探秘之isa(前篇)</title>
-    <url>/Blog/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
+    <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
     <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"isa.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">isa_t</span> &#123;</span><br><span class="line">    <span class="keyword">isa_t</span>() &#123; &#125;</span><br><span class="line">    <span class="keyword">isa_t</span>(<span class="keyword">uintptr_t</span> value) : bits(value) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    Class cls;</span><br><span class="line">    <span class="keyword">uintptr_t</span> bits;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(ISA_BITFIELD)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        ISA_BITFIELD;  <span class="comment">// defined in isa.h</span></span><br><span class="line">    &#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
@@ -165,7 +165,7 @@
   </entry>
   <entry>
     <title>Lottie动画框架的简单使用</title>
-    <url>/Blog/2020/04/11/2020-4-11/</url>
+    <url>/2020/04/11/2020-4-11/</url>
     <content><![CDATA[<p>Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.</p>
 <p>和平时iOS开发中用一行行代码编写的动画不同, lottie动画框架是由专业的动画设计师设计的.</p>
 <p>然后通过Bodymovin插件进行导出,导出的文件为json文件.</p>
@@ -198,7 +198,7 @@
   </entry>
   <entry>
     <title>App耗电量检测</title>
-    <url>/Blog/2020/04/05/2020-4-5/</url>
+    <url>/2020/04/05/2020-4-5/</url>
     <content><![CDATA[<p>虽说现在iOS手机的电池续航越来越持久了,实在不行还有充电宝,快充设备,耗电量似乎不是问题,对用户感知不明显,用户会觉得是手机整体耗电量大,或者机子老化…</p>
 <p>作为iOS开发者,还是要对自己开发的App精益求精,所以耗电量问题实际上还是要研究一下的.查看耗电量问题,需要知道是代码哪个地方出现问题,或者说是哪个线程有问题.</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">thread_act_array_t threads;</span><br><span class="line">mach_msg_type_number_t threadsCount &#x3D; 0;</span><br><span class="line">const task_t thisTask &#x3D; mach_task_self();</span><br><span class="line">kern_return_t kr &#x3D; task_threads(thisTask, &amp;threads, &amp;threadsCount);</span><br></pre></td></tr></table></figure>
@@ -225,7 +225,7 @@
   </entry>
   <entry>
     <title>iOS中获取内存值的方法</title>
-    <url>/Blog/2020/03/31/2020-3-31/</url>
+    <url>/2020/03/31/2020-3-31/</url>
     <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。</p>
 <p>调用该函数需要导入头文件:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;sys&#x2F;sysctl.h&gt;</span><br><span class="line">#import &lt;mach&#x2F;mach.h&gt;</span><br></pre></td></tr></table></figure>
@@ -248,7 +248,7 @@
   </entry>
   <entry>
     <title>利用RunLoop监控卡顿</title>
-    <url>/Blog/2020/03/28/2020-3-28/</url>
+    <url>/2020/03/28/2020-3-28/</url>
     <content><![CDATA[<p>利用RunLoop监控卡顿</p>
 <p>通过学习了戴铭大神的专栏, Get到了在App开发过程中可以利用Runloop来监控App在运行期间的卡顿,卡顿问题是老生常谈 ,并且很影响用户体验,这里截取部分关键步骤,作为自己的参考.</p>
 <p>RunLoop的6种状态</p>
@@ -280,7 +280,7 @@
   </entry>
   <entry>
     <title>Git在终端中的一些常用命令</title>
-    <url>/Blog/2020/03/26/2020-3-26/</url>
+    <url>/2020/03/26/2020-3-26/</url>
     <content><![CDATA[<p>Git在终端中的一些常用命令</p>
 <p>公司以自有服务器搭建gitLab用于代码托管, 虽说有像source tree, Tower等非常好用的可视化git管理软件,但也有很多人热衷于在终端上使用git命令,有种返璞归真的意思,今天就自己简单回顾了一些常用的git命令, 毕竟好记性不如烂笔头.</p>
 <p>git mv xxx kkkk</p>
@@ -352,7 +352,7 @@
   </entry>
   <entry>
     <title>关于静态分析工具 infer 的简单使用</title>
-    <url>/Blog/2020/03/05/2020-3-5/</url>
+    <url>/2020/03/05/2020-3-5/</url>
     <content><![CDATA[<p>静态分析工具 infer 的简单使用</p>
 <p>在iOS开发中或许会用到一款用于静态分析的工具 - infer, 对于这个工具的出处和原理,网上也有相关介绍.</p>
 <p>这里,简单记录一下使用步骤:</p>
@@ -389,7 +389,7 @@
   </entry>
   <entry>
     <title>随笔一则</title>
-    <url>/Blog/2020/02/16/2020-2-16/</url>
+    <url>/2020/02/16/2020-2-16/</url>
     <content><![CDATA[<p>​    昨晚外面还在风雨交加,今天就是个大太阳,就是温度有点低.</p>
 <p>​    看今天的网络,仿佛一场自发的摄影大赛,各种抓拍的雪景,虽说疫情当前,但这场短暂的春雪还是给广大网友们带来了一丝快乐,毕竟大家都在家憋坏了……</p>
 <p>​    昨晚还看到东南亚一些国家发出了”放弃疫情防治措施”的新闻,貌似那边就是百姓该吃吃该喝喝,社会正常运作的意思,想来疫情程度不同,号称新冠病杀伤力不如Sara,于是放弃抵抗?!</p>
@@ -406,7 +406,7 @@
   </entry>
   <entry>
     <title>开篇</title>
-    <url>/Blog/2020/02/15/2020-2-15/</url>
+    <url>/2020/02/15/2020-2-15/</url>
     <content><![CDATA[<p>2020年开年的事,大家都知道了,目前仍然在经历着…</p>
 <p>由于各方面政策的原因,一直宅着,那就找点事情捣鼓捣鼓吧:买了云主机,开了VPN,</p>
 <p>订了网上课程…其实我只是想搭个个人博客,那么,这就是 2020年 的第一篇博文吧.</p>
