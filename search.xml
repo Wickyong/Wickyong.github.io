@@ -1,270 +1,457 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>Flutter与iOS的混合开发</title>
-      <link href="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/"/>
-      <url>/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/</url>
-      
-        <content type="html"><![CDATA[<h3 id="FLutter与iOS混合开发的三种方式"><a href="#FLutter与iOS混合开发的三种方式" class="headerlink" title="FLutter与iOS混合开发的三种方式"></a>FLutter与iOS混合开发的三种方式</h3><h4 id="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"><a href="#本文记载了原生iOS项目下集成Flutter的混合开发的三种方式" class="headerlink" title="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"></a>本文记载了原生iOS项目下集成Flutter的混合开发的三种方式</h4><p>以下均以示例说明：<br>环境说明: Macbook air M1，iPhone X</p><h5 id="原生嵌套Flutter-Module"><a href="#原生嵌套Flutter-Module" class="headerlink" title="原生嵌套Flutter Module"></a>原生嵌套Flutter Module</h5><p>步骤：</p><ol><li>Android Studio(简称AS)创建Flutter_Module工程(创建完编译一下))<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module.png" class="" title="创建flutter_module"><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module.png" alt="">)创建NativeDemo工程<img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BANative.png" alt=""></li><li>终端CD /NativeDemo 中，执行 </li></ol><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pod init</span></span><br></pre></td></tr></table></figure><ol start="4"><li>在podfile中，编辑如下代码：<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Uncomment the next line to define a global platform for your project</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">flutter_application_path = <span class="string">'../flutter_module'</span></span><br><span class="line"><span class="built_in">load</span> File.join(flutter_application_path, <span class="string">'.ios'</span>, <span class="string">'Flutter'</span>, <span class="string">'podhelper.rb'</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">platform</span> :ios, <span class="string">'9.0'</span></span><br><span class="line"></span><br><span class="line">target <span class="string">'NativeDemo'</span> <span class="built_in">do</span></span><br><span class="line"> install_all_flutter_pods(flutter_application_path)  </span><br><span class="line">  use_frameworks!</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Pods for NativeDemo</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></li><li>终端执行<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod <span class="keyword">install</span></span><br></pre></td></tr></table></figure></li><li>打开NativeDemo.xcworkspace，打开ViewController，导入&lt;Flutter/Flutter.h&gt;添加<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    UIButton *flutterBtn = [[UIButton alloc]<span class="string">initWithFrame:</span>CGRectMake(<span class="number">100</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">100</span>)];</span><br><span class="line">    </span><br><span class="line">    [flutterBtn <span class="string">setTitle:</span>@<span class="string">"点击跳转至Flutter"</span> <span class="string">forState:</span>UIControlStateNormal];</span><br><span class="line">    </span><br><span class="line">    flutterBtn.backgroundColor = [UIColor blueColor];</span><br><span class="line">    </span><br><span class="line">    [flutterBtn <span class="string">addTarget:</span>self <span class="string">action:</span><span class="meta">@selector</span>(<span class="string">presentToFlutter:</span>) <span class="string">forControlEvents:</span>UIControlEventTouchUpInside];</span><br><span class="line">    </span><br><span class="line">    [self.view <span class="string">addSubview:</span>flutterBtn];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>另外添加点击事件<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)<span class="string">presentToFlutter :</span>(UIButton *)sender&#123;</span><br><span class="line">    FlutterViewController * vc = [[FlutterViewController alloc]init];</span><br><span class="line">    </span><br><span class="line">    [self <span class="string">presentViewController:</span>vc <span class="string">animated:</span>YES <span class="string">completion:</span>nil];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li>真机运行结果：<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Native2Flutter.gif" alt=""></li></ol><p>8.原生iOS项目嵌入Flutter完成</p><h6 id="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"><a href="#此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。" class="headerlink" title="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"></a>此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。</h6><h5 id="flutter编译产物framework嵌入原生项目"><a href="#flutter编译产物framework嵌入原生项目" class="headerlink" title="flutter编译产物framework嵌入原生项目"></a>flutter编译产物framework嵌入原生项目</h5><p>步骤：<br>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module%E5%92%8CNative.png" alt=""></p><p>2.进入当前的flutter_module目录，终端输入</p><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flutter build ios-framework <span class="params">--xcframework</span> <span class="params">--no-universal</span> <span class="params">--output=</span><span class="string">../Flutter_Frameworks</span></span><br></pre></td></tr></table></figure><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks.png" alt=""><br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks2.png" alt=""></p><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks3.png" alt=""></p><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks4.png" alt=""></p><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks5.png" alt=""></p><p>3.将Flutter_frameworks文件夹拖入NativeDemo<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks6.png" alt=""></p><p>4.打开NativeDemo/TARGETS/Build Setting, 搜索栏搜索“Framework Search”<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks7.png" alt=""></p><p>5.输入路径参数$(inherited) 和 $(PROJECT_DIR)/Flutter_Frameworks/Release<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks8.png" alt=""></p><p>6.NativeDemo目录创建虚文件夹Frameworks<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks9.png" alt=""></p><p>7.将Flutter_Framework/Release里的App.xcframework和Flutter.xcframework拖入NativeDemo项目中<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks10.png" alt=""></p><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks11.png" alt=""></p><p>8.这样framework栏里就显示<img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks12.png" alt=""></p><p>9.将 DO Not Embed 改成 Embed &amp; Sign<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks13.png" alt=""></p><p>10.同上个示例一样，写入按钮代码,运行，能得到一样的运行结果</p><h6 id="分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境"><a href="#分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境" class="headerlink" title="分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境"></a>分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境</h6><h5 id="CocoaPods与Framework配合混合开发"><a href="#CocoaPods与Framework配合混合开发" class="headerlink" title="CocoaPods与Framework配合混合开发"></a>CocoaPods与Framework配合混合开发</h5><p>鉴于App.framework更新频繁，而Flutter.framework更新较少，所以有了第三种方式<br>步骤：</p><p>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo<br>2.进入flutter_module目录，终端输入</p><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flutter build ios-framework <span class="params">--cocoapods</span> <span class="params">--xcframework</span> <span class="params">--no-universal</span> <span class="params">--output=</span><span class="string">../Framework</span></span><br></pre></td></tr></table></figure><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework.png" alt=""></p><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework2.png" alt=""></p><p>3.发现编译的产物跟第二种方式还是有区别的<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework4.png" alt=""></p><p>4.进入NativeDemo,终端执行</p><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pod init</span></span><br></pre></td></tr></table></figure><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework5.png" alt=""></p><p>5.将生成的Framework文件夹拖入NativeDemo目录<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework7.png" alt=""></p><p>6.打开podfile,编辑如下一行代码</p><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod <span class="string">'Flutter'</span>, :<span class="function"><span class="params">podspec</span> =&gt;</span> <span class="string">'Framework/Debug/Flutter.podspec'</span></span><br></pre></td></tr></table></figure><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework6.png" alt=""></p><p>使用Framework/Debug文件夹<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework8.png" alt=""></p><p>7.终端执行</p><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod <span class="keyword">install</span></span><br></pre></td></tr></table></figure><p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework9.png" alt=""></p><p>这样Flutter框架先进入原生项目中，以CocoaPods的形式</p><p>8.打开NativeDemo项目，将NativeDemo/Framework/Debug/App.xcframework拖入项目的Frameworks文件夹中，并把TARGET/General/framework栏中的App.xcframework的Embed由 DO Not Embed 改成 Embed &amp; Sign</p><p>9.照例在ViewController中加入按钮代码，最终也能正常在原生项目中运行Flutter。</p><h6 id="分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。"><a href="#分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。" class="headerlink" title="分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。"></a>分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。</h6>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>iOS底层探秘之objc_msgSend流程</title>
-      <link href="/2020/09/21/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bobjc_msgSend%E6%B5%81%E7%A8%8B/"/>
-      <url>/2020/09/21/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bobjc_msgSend%E6%B5%81%E7%A8%8B/</url>
-      
-        <content type="html"><![CDATA[<h3 id="一-编译和运行时"><a href="#一-编译和运行时" class="headerlink" title="一.编译和运行时"></a>一.编译和运行时</h3><h4 id="编译-顾名思义就是正在编译的时候"><a href="#编译-顾名思义就是正在编译的时候" class="headerlink" title="编译:顾名思义就是正在编译的时候"></a>编译:顾名思义就是正在编译的时候</h4><p>  那啥叫编译呢?就是编译器帮你把源代码翻译成机器能识别的代码.(当然只是⼀般意义上这么说,实际上可能只是翻译成某个中间状态的语⾔.)</p><p>  那编译时就是简单的作⼀些翻译⼯作 ,⽐如检查⽼兄你有没有粗⼼写错啥关键字了啊.有啥词法分析,语法分析之类的过程. 就像个⽼师检查学⽣的作⽂中有没有错别字和病句⼀样 .如果发现啥错误编译器就告诉你.如果你⽤微软的VS的话,点下build.那就开始编译,如果下⾯有errors或者warning信息,那都是编译器检查出来的.所谓这时的错误就叫编译时错误,这个过程中做的啥类型检查也就叫编译<br>时类型检查,或静态类型检查(所谓静态嘛就是没把真把代码放内存中运⾏起来,⽽只是把代码当作⽂本来扫描下). 所以有时⼀些⼈说编译时还分配内存啥的肯定是错误的说法.</p><h4 id="运行时-就是代码跑起来了-被装载到内存中去了"><a href="#运行时-就是代码跑起来了-被装载到内存中去了" class="headerlink" title="运行时:就是代码跑起来了.被装载到内存中去了"></a>运行时:就是代码跑起来了.被装载到内存中去了</h4><p>  你的代码保存在磁盘上没装⼊内存之前是个死家伙.只有跑到内存中才变成活的).⽽运⾏时类型检查就与前⾯讲的编译时类型检查(或者静态类型检查)不⼀样.不是简单的扫描代码.⽽是在内存中做些操作,做些判断.</p><h3 id="二-OC中的Runtime"><a href="#二-OC中的Runtime" class="headerlink" title="二.OC中的Runtime"></a>二.OC中的Runtime</h3><h4 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h4><p>  Runtime有两个版本 ⼀个Legacy版本(早期版本) ，⼀个Modern版本(现⾏版本)</p><ul><li>早期版本对应的编程接⼝:Objective-C 1.0 </li><li>现⾏版本对应的编程接⼝:Objective-C 2.0 </li><li>早期版本⽤于Objective-C 1.0, 32位的Mac OS X的平台上</li><li>现⾏版本:iPhone程序和Mac OS X v10.5 及以后的系统中的 64 位程序</li></ul><p><a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Objective-C Runtime Programming Guide</a></p><h4 id="如何调用"><a href="#如何调用" class="headerlink" title="如何调用"></a>如何调用</h4><ul><li>Objective-C Code</li><li>FrameWork&amp;Service</li><li>Runtime API</li></ul><p><img src="runtime%E7%BB%93%E6%9E%84.png" alt=""></p><h3 id="三-Objc-msgSend流程分析"><a href="#三-Objc-msgSend流程分析" class="headerlink" title="三.Objc_msgSend流程分析"></a>三.Objc_msgSend流程分析</h3><h4 id="方法的本质"><a href="#方法的本质" class="headerlink" title="方法的本质"></a>方法的本质</h4><p>从OC底层代码来看,方法的本质就是底层调用objc_msgSend消息发送方法</p><h4 id="objc-msgSend"><a href="#objc-msgSend" class="headerlink" title="objc_msgSend"></a>objc_msgSend</h4><p>objc_msgSend是用汇编语言写的,原因是:</p><ul><li>在C语言中不可能通过写一个函数来保留未知的参数并且跳转到任意的函数指针,C语言没有满足做这件事的必要性</li><li>汇编运行速度快</li></ul><h4 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h4><ol><li><p>ENTRY_objc_msgSend</p></li><li><p>对消息接收者(id self, self_cmd) 判断处理</p></li><li><p>taggedPointer 判断处理</p></li><li><p>‘GetClassFromIsa_P16 isa’指针处理 - class</p></li><li><p>CacheLookup 查找缓存</p></li><li><p>‘cache_t’处理’bucket’以及内存哈希处理 </p><ul><li>找不到递归下一个’bucket’</li><li>找到了就返回’{imp, sel} = * bucket -&gt; imp’</li><li>遇到意外就重试</li><li>找不到就’JumpMiss’</li></ul></li><li><p>objc_msgSend_uncached 告知找不到缓存’imp’</p></li><li><p>‘STATIC_ENTRY__objc_msgSend_uncached’</p></li><li><p>‘MethodTableLookup’方法表查找</p><ul><li>‘save parameter registers’</li><li>‘self’ 以及_cmd准备</li><li>‘class_lookupMethodAndLoadCache3’调用</li></ul></li></ol><p>至此,快速查找缓存流程结束.</p>]]></content>
-      
-      
+<search>
+  <entry>
+    <title>Flutter与iOS的混合开发</title>
+    <url>/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/</url>
+    <content><![CDATA[<h3 id="FLutter与iOS混合开发的三种方式"><a href="#FLutter与iOS混合开发的三种方式" class="headerlink" title="FLutter与iOS混合开发的三种方式"></a>FLutter与iOS混合开发的三种方式</h3><h4 id="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"><a href="#本文记载了原生iOS项目下集成Flutter的混合开发的三种方式" class="headerlink" title="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"></a>本文记载了原生iOS项目下集成Flutter的混合开发的三种方式</h4><p>以下均以示例说明：<br>环境说明: Macbook air M1，iPhone X</p>
+<h5 id="原生嵌套Flutter-Module"><a href="#原生嵌套Flutter-Module" class="headerlink" title="原生嵌套Flutter Module"></a>原生嵌套Flutter Module</h5><p>步骤：</p>
+<ol>
+<li>Android Studio(简称AS)创建Flutter_Module工程(创建完编译一下))<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module.png" class="" title="创建flutter_module}{% asset_img 创建Native.png 创建Native"></li>
+<li>终端CD /NativeDemo 中，执行 </li>
+</ol>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">pod init</span></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>在podfile中，编辑如下代码：<figure class="highlight livecodeserver"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Uncomment the next line to define a global platform for your project</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">flutter_application_path = <span class="string">'../flutter_module'</span></span><br><span class="line"><span class="built_in">load</span> File.join(flutter_application_path, <span class="string">'.ios'</span>, <span class="string">'Flutter'</span>, <span class="string">'podhelper.rb'</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">platform</span> :ios, <span class="string">'9.0'</span></span><br><span class="line"></span><br><span class="line">target <span class="string">'NativeDemo'</span> <span class="built_in">do</span></span><br><span class="line"> install_all_flutter_pods(flutter_application_path)  </span><br><span class="line">  use_frameworks!</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Pods for NativeDemo</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></li>
+<li>终端执行<figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">pod <span class="keyword">install</span></span><br></pre></td></tr></table></figure></li>
+<li>打开NativeDemo.xcworkspace，打开ViewController，导入&lt;Flutter/Flutter.h&gt;添加<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    UIButton *flutterBtn = [[UIButton alloc]<span class="string">initWithFrame:</span>CGRectMake(<span class="number">100</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">100</span>)];</span><br><span class="line">    </span><br><span class="line">    [flutterBtn <span class="string">setTitle:</span>@<span class="string">"点击跳转至Flutter"</span> <span class="string">forState:</span>UIControlStateNormal];</span><br><span class="line">    </span><br><span class="line">    flutterBtn.backgroundColor = [UIColor blueColor];</span><br><span class="line">    </span><br><span class="line">    [flutterBtn <span class="string">addTarget:</span>self <span class="string">action:</span><span class="meta">@selector</span>(<span class="string">presentToFlutter:</span>) <span class="string">forControlEvents:</span>UIControlEventTouchUpInside];</span><br><span class="line">    </span><br><span class="line">    [self.view <span class="string">addSubview:</span>flutterBtn];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+另外添加点击事件<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)<span class="string">presentToFlutter :</span>(UIButton *)sender&#123;</span><br><span class="line">    FlutterViewController * vc = [[FlutterViewController alloc]init];</span><br><span class="line">    </span><br><span class="line">    [self <span class="string">presentViewController:</span>vc <span class="string">animated:</span>YES <span class="string">completion:</span>nil];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>真机运行结果：<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Native2Flutter.gif" class="" title="Native2Flutter">
+
+</li>
+</ol>
+<p>8.原生iOS项目嵌入Flutter完成</p>
+<h6 id="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"><a href="#此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。" class="headerlink" title="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"></a>此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。</h6><h5 id="flutter编译产物framework嵌入原生项目"><a href="#flutter编译产物framework嵌入原生项目" class="headerlink" title="flutter编译产物framework嵌入原生项目"></a>flutter编译产物framework嵌入原生项目</h5><p>步骤：<br>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module%E5%92%8CNative.png" class="" title="创建flutter_module和Native">
+
+<p>2.进入当前的flutter_module目录，终端输入</p>
+<figure class="highlight jboss-cli"><table><tr><td class="code"><pre><span class="line">flutter build ios-framework <span class="params">--xcframework</span> <span class="params">--no-universal</span> <span class="params">--output=</span><span class="string">../Flutter_Frameworks</span></span><br></pre></td></tr></table></figure>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks.png" class="" title="终端生成frameworks">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks2.png" class="" title="终端生成frameworks2">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks3.png" class="" title="终端生成frameworks3">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks4.png" class="" title="终端生成frameworks4">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks5.png" class="" title="终端生成frameworks5">
+
+<p>3.将Flutter_frameworks文件夹拖入NativeDemo</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks6.png" class="" title="终端生成frameworks6">
+
+<p>4.打开NativeDemo/TARGETS/Build Setting, 搜索栏搜索“Framework Search”</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks7.png" class="" title="终端生成frameworks7">
+
+<p>5.输入路径参数$(inherited) 和 $(PROJECT_DIR)/Flutter_Frameworks/Release</p>
+
+
+<p>6.NativeDemo目录创建虚文件夹Frameworks</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks9.png" class="" title="终端生成frameworks9">
+
+<p>7.将Flutter_Framework/Release里的App.xcframework和Flutter.xcframework拖入NativeDemo项目中</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks10.png" class="" title="终端生成frameworks10">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks11.png" class="" title="终端生成frameworks11">
+
+<p>8.这样framework栏里就显示<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks12.png" class="" title="终端生成frameworks12"></p>
+<p>9.将 DO Not Embed 改成 Embed &amp; Sign</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks13.png" class="" title="终端生成frameworks13">
+
+<p>10.同上个示例一样，写入按钮代码,运行，能得到一样的运行结果</p>
+<h6 id="分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境"><a href="#分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境" class="headerlink" title="分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境"></a>分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境</h6><h5 id="CocoaPods与Framework配合混合开发"><a href="#CocoaPods与Framework配合混合开发" class="headerlink" title="CocoaPods与Framework配合混合开发"></a>CocoaPods与Framework配合混合开发</h5><p>鉴于App.framework更新频繁，而Flutter.framework更新较少，所以有了第三种方式<br>步骤：</p>
+<p>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo<br>2.进入flutter_module目录，终端输入</p>
+<figure class="highlight jboss-cli"><table><tr><td class="code"><pre><span class="line">flutter build ios-framework <span class="params">--cocoapods</span> <span class="params">--xcframework</span> <span class="params">--no-universal</span> <span class="params">--output=</span><span class="string">../Framework</span></span><br></pre></td></tr></table></figure>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework.png" class="" title="Cocoa&amp;framework">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework2.png" class="" title="Cocoa&amp;framework2">
+
+<p>3.发现编译的产物跟第二种方式还是有区别的</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework4.png" class="" title="Cocoa&amp;framework4">
+
+
+<p>4.进入NativeDemo,终端执行</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">pod init</span></span><br></pre></td></tr></table></figure>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework5.png" class="" title="Cocoa&amp;framework5">
+
+<p>5.将生成的Framework文件夹拖入NativeDemo目录</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework7.png" class="" title="Cocoa&amp;framework7">
+
+<p>6.打开podfile,编辑如下一行代码</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">pod <span class="string">'Flutter'</span>, :<span class="function"><span class="params">podspec</span> =&gt;</span> <span class="string">'Framework/Debug/Flutter.podspec'</span></span><br></pre></td></tr></table></figure>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework6.png" class="" title="Cocoa&amp;framework6">
+
+<p>使用Framework/Debug文件夹</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework8.png" class="" title="Cocoa&amp;framework8">
+
+
+<p>7.终端执行</p>
+<figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">pod <span class="keyword">install</span></span><br></pre></td></tr></table></figure>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework9.png" class="" title="Cocoa&amp;framework9">
+
+<p>这样Flutter框架先进入原生项目中，以CocoaPods的形式</p>
+<p>8.打开NativeDemo项目，将NativeDemo/Framework/Debug/App.xcframework拖入项目的Frameworks文件夹中，并把TARGET/General/framework栏中的App.xcframework的Embed由 DO Not Embed 改成 Embed &amp; Sign</p>
+<p>9.照例在ViewController中加入按钮代码，最终也能正常在原生项目中运行Flutter。</p>
+<h6 id="分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。"><a href="#分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。" class="headerlink" title="分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。"></a>分析：此方式相对而言，是不需要原生开发人员搭建Flutter环境的，是入侵度最小的，耦合度最低的，是最适合当前移动端的多元开发环境的混合方案。</h6>]]></content>
+  </entry>
+  <entry>
+    <title>iOS底层探秘之objc_msgSend流程</title>
+    <url>/2020/09/21/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bobjc_msgSend%E6%B5%81%E7%A8%8B/</url>
+    <content><![CDATA[<h3 id="一-编译和运行时"><a href="#一-编译和运行时" class="headerlink" title="一.编译和运行时"></a>一.编译和运行时</h3><h4 id="编译-顾名思义就是正在编译的时候"><a href="#编译-顾名思义就是正在编译的时候" class="headerlink" title="编译:顾名思义就是正在编译的时候"></a>编译:顾名思义就是正在编译的时候</h4><p>  那啥叫编译呢?就是编译器帮你把源代码翻译成机器能识别的代码.(当然只是⼀般意义上这么说,实际上可能只是翻译成某个中间状态的语⾔.)</p>
+<p>  那编译时就是简单的作⼀些翻译⼯作 ,⽐如检查⽼兄你有没有粗⼼写错啥关键字了啊.有啥词法分析,语法分析之类的过程. 就像个⽼师检查学⽣的作⽂中有没有错别字和病句⼀样 .如果发现啥错误编译器就告诉你.如果你⽤微软的VS的话,点下build.那就开始编译,如果下⾯有errors或者warning信息,那都是编译器检查出来的.所谓这时的错误就叫编译时错误,这个过程中做的啥类型检查也就叫编译<br>时类型检查,或静态类型检查(所谓静态嘛就是没把真把代码放内存中运⾏起来,⽽只是把代码当作⽂本来扫描下). 所以有时⼀些⼈说编译时还分配内存啥的肯定是错误的说法.</p>
+<h4 id="运行时-就是代码跑起来了-被装载到内存中去了"><a href="#运行时-就是代码跑起来了-被装载到内存中去了" class="headerlink" title="运行时:就是代码跑起来了.被装载到内存中去了"></a>运行时:就是代码跑起来了.被装载到内存中去了</h4><p>  你的代码保存在磁盘上没装⼊内存之前是个死家伙.只有跑到内存中才变成活的).⽽运⾏时类型检查就与前⾯讲的编译时类型检查(或者静态类型检查)不⼀样.不是简单的扫描代码.⽽是在内存中做些操作,做些判断.</p>
+<h3 id="二-OC中的Runtime"><a href="#二-OC中的Runtime" class="headerlink" title="二.OC中的Runtime"></a>二.OC中的Runtime</h3><h4 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h4><p>  Runtime有两个版本 ⼀个Legacy版本(早期版本) ，⼀个Modern版本(现⾏版本)</p>
+<ul>
+<li>早期版本对应的编程接⼝:Objective-C 1.0 </li>
+<li>现⾏版本对应的编程接⼝:Objective-C 2.0 </li>
+<li>早期版本⽤于Objective-C 1.0, 32位的Mac OS X的平台上</li>
+<li>现⾏版本:iPhone程序和Mac OS X v10.5 及以后的系统中的 64 位程序</li>
+</ul>
+<p><a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Objective-C Runtime Programming Guide</a></p>
+<h4 id="如何调用"><a href="#如何调用" class="headerlink" title="如何调用"></a>如何调用</h4><ul>
+<li>Objective-C Code</li>
+<li>FrameWork&amp;Service</li>
+<li>Runtime API</li>
+</ul>
+<p><img src="runtime%E7%BB%93%E6%9E%84.png" alt=""></p>
+<h3 id="三-Objc-msgSend流程分析"><a href="#三-Objc-msgSend流程分析" class="headerlink" title="三.Objc_msgSend流程分析"></a>三.Objc_msgSend流程分析</h3><h4 id="方法的本质"><a href="#方法的本质" class="headerlink" title="方法的本质"></a>方法的本质</h4><p>从OC底层代码来看,方法的本质就是底层调用objc_msgSend消息发送方法</p>
+<h4 id="objc-msgSend"><a href="#objc-msgSend" class="headerlink" title="objc_msgSend"></a>objc_msgSend</h4><p>objc_msgSend是用汇编语言写的,原因是:</p>
+<ul>
+<li>在C语言中不可能通过写一个函数来保留未知的参数并且跳转到任意的函数指针,C语言没有满足做这件事的必要性</li>
+<li>汇编运行速度快</li>
+</ul>
+<h4 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h4><ol>
+<li><p>ENTRY_objc_msgSend</p>
+</li>
+<li><p>对消息接收者(id self, self_cmd) 判断处理</p>
+</li>
+<li><p>taggedPointer 判断处理</p>
+</li>
+<li><p>‘GetClassFromIsa_P16 isa’指针处理 - class</p>
+</li>
+<li><p>CacheLookup 查找缓存</p>
+</li>
+<li><p>‘cache_t’处理’bucket’以及内存哈希处理 </p>
+<ul>
+<li>找不到递归下一个’bucket’</li>
+<li>找到了就返回’{imp, sel} = * bucket -&gt; imp’</li>
+<li>遇到意外就重试</li>
+<li>找不到就’JumpMiss’</li>
+</ul>
+</li>
+<li><p>objc_msgSend_uncached 告知找不到缓存’imp’</p>
+</li>
+<li><p>‘STATIC_ENTRY__objc_msgSend_uncached’</p>
+</li>
+<li><p>‘MethodTableLookup’方法表查找</p>
+<ul>
+<li>‘save parameter registers’</li>
+<li>‘self’ 以及_cmd准备</li>
+<li>‘class_lookupMethodAndLoadCache3’调用</li>
+</ul>
+</li>
+</ol>
+<p>至此,快速查找缓存流程结束.</p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 底层原理 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>iOS底层探秘之isa(前篇)</title>
-      <link href="/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/"/>
-      <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
-      
-        <content type="html"><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"isa.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">isa_t</span> &#123;</span><br><span class="line">    <span class="keyword">isa_t</span>() &#123; &#125;</span><br><span class="line">    <span class="keyword">isa_t</span>(<span class="keyword">uintptr_t</span> value) : bits(value) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    Class cls;</span><br><span class="line">    <span class="keyword">uintptr_t</span> bits;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(ISA_BITFIELD)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        ISA_BITFIELD;  <span class="comment">// defined in isa.h</span></span><br><span class="line">    &#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体.</p><p>什么是联合体?</p><p>当多个数据需要共享内存或者多个数据每次只取其一时，可以利用联合体(union)。在C Programming Language 一书中对于联合体是这么描述的：</p><p>   1)联合体是一个结构；</p><p>   2)它的所有成员相对于基地址的偏移量都为0；</p><p>   3)此结构空间要大到足够容纳最”宽”的成员；</p><p>   4)其对齐方式要适合其中所有的成员；</p><h3 id="二-iSA的结构"><a href="#二-iSA的结构" class="headerlink" title="二. iSA的结构"></a>二. iSA的结构</h3><p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p><p>什么是位域?</p><p>位域指信息在存储时，并不需要占用一个完整的字节， 而只需占几个或一个二进制位。例如在存放一个开关量时，只有0和1 两种状态， 用一位二进位即可。为了节省存储空间，并使处理简便，C语言又提供了一种数据结构，称为“位域”或“位段”。所谓“位域”是把一个字节中的二进位划分为几 个不同的区域， 并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。 这样就可以把几个不同的对象用一个字节的二进制位域来表示。</p><p>其中ISA_BITFIELD在不同环境下有不同定义:</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="meta-keyword">if</span> __arm64__</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MASK        0x0000000ffffffff8ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_MASK  0x000003f000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_VALUE 0x000001a000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_BITFIELD                                                      \</span></span><br><span class="line">      <span class="keyword">uintptr_t</span> nonpointer        : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_assoc         : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_cxx_dtor      : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> shiftcls          : <span class="number">33</span>; <span class="comment">/*MACH_VM_MAX_ADDRESS 0x1000000000*/</span> \</span><br><span class="line">      <span class="keyword">uintptr_t</span> magic             : <span class="number">6</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> weakly_referenced : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> deallocating      : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_sidetable_rc  : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> extra_rc          : <span class="number">19</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_ONE   (1ULL&lt;&lt;45)</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_HALF  (1ULL&lt;&lt;18)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">elif</span> __x86_64__</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MASK        0x00007ffffffffff8ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_MASK  0x001f800000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_VALUE 0x001d800000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_BITFIELD                                                        \</span></span><br><span class="line">      <span class="keyword">uintptr_t</span> nonpointer        : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_assoc         : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_cxx_dtor      : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> shiftcls          : <span class="number">44</span>; <span class="comment">/*MACH_VM_MAX_ADDRESS 0x7fffffe00000*/</span> \</span><br><span class="line">      <span class="keyword">uintptr_t</span> magic             : <span class="number">6</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> weakly_referenced : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> deallocating      : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_sidetable_rc  : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> extra_rc          : <span class="number">8</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_ONE   (1ULL&lt;&lt;56)</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_HALF  (1ULL&lt;&lt;7)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">error</span> unknown architecture for packed isa</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure><h3 id="三-ISA-BITFIELD参数分析"><a href="#三-ISA-BITFIELD参数分析" class="headerlink" title="三. ISA_BITFIELD参数分析"></a>三. ISA_BITFIELD参数分析</h3><p><img src="arm64.png" alt=""></p><p>(上图对应 arm64 架构)</p><p><font color=#D2691E>nonpointer</font> ：表示是否对 isa 指针开启指针优化. 0：纯isa指针，1：不⽌是类对象地址,isa 中包含了类信息、对象的引⽤计数等</p><p><font color=#D2691E>has_assoc</font> ：关联对象标志位，0没有，1存在</p><p><font color=#D2691E>has_cxx_dtor</font>：该对象是否有 C++ 或者 Objc 的析构器,如果有析构函数,则需要做析构逻辑,</p><p>如果没有,则可以更快的释放对象</p><p><font color=#D2691E>shiftcls</font>: 存储类指针的值。开启指针优化的情况下，在 arm64 架构中有 33 位⽤来存储类指针。</p><p><font color=#D2691E>magic</font>：⽤于调试器判断当前对象是真的对象还是没有初始化的空间</p><p><font color=#D2691E>weakly_referenced</font>：标志对象是否被指向或者曾经指向⼀个 ARC 的弱变量，没有弱引⽤的对象可以更快释放。</p><p><font color=#D2691E>deallocating</font>：标志对象是否正在释放内存</p><p><font color=#D2691E>has_sidetable_rc</font>：当对象引⽤计数值⼤于 10 时，则需要借⽤该变量存储进位</p><p><font color=#D2691E>extra_rc</font>：当表示该对象的引⽤计数值，实际上是引⽤计数值减 1，例如，如果对象的引⽤计数为 10，那么 extra_rc 为 9。如果引⽤计数⼤于 10，则需要使⽤到下⾯的 has_sidetable_rc。</p><p>那么isa具体是怎么运行的呢?</p><p>未完待续…</p>]]></content>
-      
-      
+      <tags>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS底层探秘之isa(前篇)</title>
+    <url>/2020/09/10/iOS%E5%BA%95%E5%B1%82%E6%8E%A2%E7%A7%98%E4%B9%8Bisa(%E5%89%8D%E7%AF%87)/</url>
+    <content><![CDATA[<h3 id="一-iSA是什么"><a href="#一-iSA是什么" class="headerlink" title="一. iSA是什么?"></a>一. iSA是什么?</h3><p>从源码可知:</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"isa.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">isa_t</span> &#123;</span><br><span class="line">    <span class="keyword">isa_t</span>() &#123; &#125;</span><br><span class="line">    <span class="keyword">isa_t</span>(<span class="keyword">uintptr_t</span> value) : bits(value) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    Class cls;</span><br><span class="line">    <span class="keyword">uintptr_t</span> bits;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(ISA_BITFIELD)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        ISA_BITFIELD;  <span class="comment">// defined in isa.h</span></span><br><span class="line">    &#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>结论: isa是对象alloc的时候，伴随初始化的一个属性,isa底层是一个isa_t结构的联合体.</p>
+<p>什么是联合体?</p>
+<p>当多个数据需要共享内存或者多个数据每次只取其一时，可以利用联合体(union)。在C Programming Language 一书中对于联合体是这么描述的：</p>
+<p>   1)联合体是一个结构；</p>
+<p>   2)它的所有成员相对于基地址的偏移量都为0；</p>
+<p>   3)此结构空间要大到足够容纳最”宽”的成员；</p>
+<p>   4)其对齐方式要适合其中所有的成员；</p>
+<h3 id="二-iSA的结构"><a href="#二-iSA的结构" class="headerlink" title="二. iSA的结构"></a>二. iSA的结构</h3><p>isa_t中包含cls类的指针,以及 ISA_BITFIELD 位域.</p>
+<p>什么是位域?</p>
+<p>位域指信息在存储时，并不需要占用一个完整的字节， 而只需占几个或一个二进制位。例如在存放一个开关量时，只有0和1 两种状态， 用一位二进位即可。为了节省存储空间，并使处理简便，C语言又提供了一种数据结构，称为“位域”或“位段”。所谓“位域”是把一个字节中的二进位划分为几 个不同的区域， 并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。 这样就可以把几个不同的对象用一个字节的二进制位域来表示。</p>
+<p>其中ISA_BITFIELD在不同环境下有不同定义:</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta"># <span class="meta-keyword">if</span> __arm64__</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MASK        0x0000000ffffffff8ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_MASK  0x000003f000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_VALUE 0x000001a000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_BITFIELD                                                      \</span></span><br><span class="line">      <span class="keyword">uintptr_t</span> nonpointer        : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_assoc         : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_cxx_dtor      : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> shiftcls          : <span class="number">33</span>; <span class="comment">/*MACH_VM_MAX_ADDRESS 0x1000000000*/</span> \</span><br><span class="line">      <span class="keyword">uintptr_t</span> magic             : <span class="number">6</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> weakly_referenced : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> deallocating      : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_sidetable_rc  : <span class="number">1</span>;                                       \</span><br><span class="line">      <span class="keyword">uintptr_t</span> extra_rc          : <span class="number">19</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_ONE   (1ULL&lt;&lt;45)</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_HALF  (1ULL&lt;&lt;18)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">elif</span> __x86_64__</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MASK        0x00007ffffffffff8ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_MASK  0x001f800000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_MAGIC_VALUE 0x001d800000000001ULL</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> ISA_BITFIELD                                                        \</span></span><br><span class="line">      <span class="keyword">uintptr_t</span> nonpointer        : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_assoc         : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_cxx_dtor      : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> shiftcls          : <span class="number">44</span>; <span class="comment">/*MACH_VM_MAX_ADDRESS 0x7fffffe00000*/</span> \</span><br><span class="line">      <span class="keyword">uintptr_t</span> magic             : <span class="number">6</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> weakly_referenced : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> deallocating      : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> has_sidetable_rc  : <span class="number">1</span>;                                         \</span><br><span class="line">      <span class="keyword">uintptr_t</span> extra_rc          : <span class="number">8</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_ONE   (1ULL&lt;&lt;56)</span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">define</span> RC_HALF  (1ULL&lt;&lt;7)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#   <span class="meta-keyword">error</span> unknown architecture for packed isa</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="三-ISA-BITFIELD参数分析"><a href="#三-ISA-BITFIELD参数分析" class="headerlink" title="三. ISA_BITFIELD参数分析"></a>三. ISA_BITFIELD参数分析</h3><p><img src="arm64.png" alt=""></p>
+<p>(上图对应 arm64 架构)</p>
+<p><font color=#D2691E>nonpointer</font> ：表示是否对 isa 指针开启指针优化. 0：纯isa指针，1：不⽌是类对象地址,isa 中包含了类信息、对象的引⽤计数等</p>
+<p><font color=#D2691E>has_assoc</font> ：关联对象标志位，0没有，1存在</p>
+<p><font color=#D2691E>has_cxx_dtor</font>：该对象是否有 C++ 或者 Objc 的析构器,如果有析构函数,则需要做析构逻辑,</p>
+<p>如果没有,则可以更快的释放对象</p>
+<p><font color=#D2691E>shiftcls</font>: 存储类指针的值。开启指针优化的情况下，在 arm64 架构中有 33 位⽤来存储类指针。</p>
+<p><font color=#D2691E>magic</font>：⽤于调试器判断当前对象是真的对象还是没有初始化的空间</p>
+<p><font color=#D2691E>weakly_referenced</font>：标志对象是否被指向或者曾经指向⼀个 ARC 的弱变量，没有弱引⽤的对象可以更快释放。</p>
+<p><font color=#D2691E>deallocating</font>：标志对象是否正在释放内存</p>
+<p><font color=#D2691E>has_sidetable_rc</font>：当对象引⽤计数值⼤于 10 时，则需要借⽤该变量存储进位</p>
+<p><font color=#D2691E>extra_rc</font>：当表示该对象的引⽤计数值，实际上是引⽤计数值减 1，例如，如果对象的引⽤计数为 10，那么 extra_rc 为 9。如果引⽤计数⼤于 10，则需要使⽤到下⾯的 has_sidetable_rc。</p>
+<p>那么isa具体是怎么运行的呢?</p>
+<p>未完待续…</p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 底层原理 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Lottie动画框架的简单使用</title>
-      <link href="/2020/04/11/2020-4-11/"/>
-      <url>/2020/04/11/2020-4-11/</url>
-      
-        <content type="html"><![CDATA[<p>Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.</p><p>和平时iOS开发中用一行行代码编写的动画不同, lottie动画框架是由专业的动画设计师设计的.</p><p>然后通过Bodymovin插件进行导出,导出的文件为json文件.</p><p>Lottie官方平台网站:</p><p><a href="https://lottiefiles.com" target="_blank" rel="noopener">https://lottiefiles.com</a></p><p>其原理是将通过由After Effects设计编辑的动画效果,通过json,来映射到iOS相应的动画变换类的属性中,通过CoreAnimation进行动画渲染. 相比手动写动画代码,直接导入json文件着实方便不少.</p><p><img src="Loading.gif" alt=""></p><p>使用步骤如下:</p><p>通过CocoaPods集成Lottie框架</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#pod &#39;lottie-ios&#39;, &#39;~&gt; 3.1.6&#39;#For Swift</span><br><span class="line">pod &#39;lottie-ios&#39;, &#39;~&gt; 2.5.3&#39;#For OC</span><br></pre></td></tr></table></figure><p>然后可以尝试在Lottie网站上下载一个json动画文件,拖入到工程中,再将json文件名写入代码中,示例如下:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LOTAnimationView * animationView &#x3D; [LOTAnimationView animationNamed:@&quot;222-trail-loading&quot;];</span><br><span class="line">animationView.loopAnimation &#x3D; YES;</span><br><span class="line">animationView.frame &#x3D; self.view.bounds;</span><br><span class="line">[self.view addSubview:animationView];</span><br><span class="line">[animationView playWithCompletion:^(BOOL animationFinished) &#123;</span><br><span class="line">    &#x2F;&#x2F;动画完成后执行</span><br><span class="line">    &#x2F;&#x2F;当loopAnimation &#x3D; YES时,循环播放的时候不执行</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure><p>Lottie还有一些其他的属性,如手势联动动画,配合LOTAnimationView 的 animationProgress 属性进行控制;</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic, readonly) BOOL isAnimationPlaying;&#x2F;&#x2F;判断动画是否在播放</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) BOOL loopAnimation;&#x2F;&#x2F;是否要循环播放动画</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) CGFloat animationProgress;&#x2F;&#x2F;自定义动画的播放进度</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) CGFloat animationSpeed;&#x2F;&#x2F;自定义动画的播放速度</span><br><span class="line"></span><br><span class="line">@property (nonatomic, readonly) CGFloat animationDuration;&#x2F;&#x2F;自定义动画的播放时长</span><br></pre></td></tr></table></figure><p>Lottie也支持自定义页面切换的过场动画,通过设置 present／dismiss controller 转场动画, 在需要转场效果的VC中实现UIViewControllerTransitioningDelegate代理中下面的两个方法:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#pragma mark -- 定制转场动画</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 代理返回推出控制器的动画</span><br><span class="line">- (id&lt;UIViewControllerAnimatedTransitioning&gt;)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source &#123;</span><br><span class="line">  LOTAnimationTransitionController *animationController &#x3D; [[LOTAnimationTransitionController alloc] initWithAnimationNamed:@&quot;转场动画json名1&quot; fromLayerNamed:@&quot;来自哪个图层的图层名1&quot; toLayerNamed:@&quot;去到哪个图层的图层名1&quot; applyAnimationTransform:NO];</span><br><span class="line">  return animationController;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 代理返回退出控制器的动画</span><br><span class="line">- (id&lt;UIViewControllerAnimatedTransitioning&gt;)animationControllerForDismissedController:(UIViewController *)dismissed &#123;</span><br><span class="line">  LOTAnimationTransitionController *animationController &#x3D; [[LOTAnimationTransitionController alloc] initWithAnimationNamed:@&quot;转场动画json名2&quot; fromLayerNamed:@&quot;来自哪个图层的图层名2&quot; toLayerNamed:@&quot;去到哪个图层的图层名2&quot; applyAnimationTransform:NO];</span><br><span class="line">  return animationController;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;后两个属性fromLayerNamed,toLayerNamed 可不填</span><br></pre></td></tr></table></figure><p>最后附上Lottie的iOS/Mac版官方教程地址:</p><p><a href="http://airbnb.io/lottie/#/ios" target="_blank" rel="noopener">http://airbnb.io/lottie/#/ios</a></p>]]></content>
-      
-      
+      <tags>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Lottie动画框架的简单使用</title>
+    <url>/2020/04/11/2020-4-11/</url>
+    <content><![CDATA[<p>Lottie 是 Airbnb 开源的一个动画框架, 可以支持多平台,如iOS,Android,RN,Flutter等.</p>
+<p>和平时iOS开发中用一行行代码编写的动画不同, lottie动画框架是由专业的动画设计师设计的.</p>
+<p>然后通过Bodymovin插件进行导出,导出的文件为json文件.</p>
+<p>Lottie官方平台网站:</p>
+<p><a href="https://lottiefiles.com" target="_blank" rel="noopener">https://lottiefiles.com</a></p>
+<p>其原理是将通过由After Effects设计编辑的动画效果,通过json,来映射到iOS相应的动画变换类的属性中,通过CoreAnimation进行动画渲染. 相比手动写动画代码,直接导入json文件着实方便不少.</p>
+<p><img src="Loading.gif" alt=""></p>
+<p>使用步骤如下:</p>
+<p>通过CocoaPods集成Lottie框架</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#pod &#39;lottie-ios&#39;, &#39;~&gt; 3.1.6&#39;#For Swift</span><br><span class="line">pod &#39;lottie-ios&#39;, &#39;~&gt; 2.5.3&#39;#For OC</span><br></pre></td></tr></table></figure>
+
+<p>然后可以尝试在Lottie网站上下载一个json动画文件,拖入到工程中,再将json文件名写入代码中,示例如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">LOTAnimationView * animationView &#x3D; [LOTAnimationView animationNamed:@&quot;222-trail-loading&quot;];</span><br><span class="line">animationView.loopAnimation &#x3D; YES;</span><br><span class="line">animationView.frame &#x3D; self.view.bounds;</span><br><span class="line">[self.view addSubview:animationView];</span><br><span class="line">[animationView playWithCompletion:^(BOOL animationFinished) &#123;</span><br><span class="line">    &#x2F;&#x2F;动画完成后执行</span><br><span class="line">    &#x2F;&#x2F;当loopAnimation &#x3D; YES时,循环播放的时候不执行</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>Lottie还有一些其他的属性,如手势联动动画,配合LOTAnimationView 的 animationProgress 属性进行控制;</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@property (nonatomic, readonly) BOOL isAnimationPlaying;&#x2F;&#x2F;判断动画是否在播放</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) BOOL loopAnimation;&#x2F;&#x2F;是否要循环播放动画</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) CGFloat animationProgress;&#x2F;&#x2F;自定义动画的播放进度</span><br><span class="line"></span><br><span class="line">@property (nonatomic, assign) CGFloat animationSpeed;&#x2F;&#x2F;自定义动画的播放速度</span><br><span class="line"></span><br><span class="line">@property (nonatomic, readonly) CGFloat animationDuration;&#x2F;&#x2F;自定义动画的播放时长</span><br></pre></td></tr></table></figure>
+
+<p>Lottie也支持自定义页面切换的过场动画,通过设置 present／dismiss controller 转场动画, 在需要转场效果的VC中实现UIViewControllerTransitioningDelegate代理中下面的两个方法:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">#pragma mark -- 定制转场动画</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 代理返回推出控制器的动画</span><br><span class="line">- (id&lt;UIViewControllerAnimatedTransitioning&gt;)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source &#123;</span><br><span class="line">  LOTAnimationTransitionController *animationController &#x3D; [[LOTAnimationTransitionController alloc] initWithAnimationNamed:@&quot;转场动画json名1&quot; fromLayerNamed:@&quot;来自哪个图层的图层名1&quot; toLayerNamed:@&quot;去到哪个图层的图层名1&quot; applyAnimationTransform:NO];</span><br><span class="line">  return animationController;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 代理返回退出控制器的动画</span><br><span class="line">- (id&lt;UIViewControllerAnimatedTransitioning&gt;)animationControllerForDismissedController:(UIViewController *)dismissed &#123;</span><br><span class="line">  LOTAnimationTransitionController *animationController &#x3D; [[LOTAnimationTransitionController alloc] initWithAnimationNamed:@&quot;转场动画json名2&quot; fromLayerNamed:@&quot;来自哪个图层的图层名2&quot; toLayerNamed:@&quot;去到哪个图层的图层名2&quot; applyAnimationTransform:NO];</span><br><span class="line">  return animationController;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;后两个属性fromLayerNamed,toLayerNamed 可不填</span><br></pre></td></tr></table></figure>
+
+<p>最后附上Lottie的iOS/Mac版官方教程地址:</p>
+<p><a href="http://airbnb.io/lottie/#/ios" target="_blank" rel="noopener">http://airbnb.io/lottie/#/ios</a></p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>App耗电量检测</title>
-      <link href="/2020/04/05/2020-4-5/"/>
-      <url>/2020/04/05/2020-4-5/</url>
-      
-        <content type="html"><![CDATA[<p>虽说现在iOS手机的电池续航越来越持久了,实在不行还有充电宝,快充设备,耗电量似乎不是问题,对用户感知不明显,用户会觉得是手机整体耗电量大,或者机子老化…</p><p>作为iOS开发者,还是要对自己开发的App精益求精,所以耗电量问题实际上还是要研究一下的.查看耗电量问题,需要知道是代码哪个地方出现问题,或者说是哪个线程有问题.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">thread_act_array_t threads;</span><br><span class="line">mach_msg_type_number_t threadsCount &#x3D; 0;</span><br><span class="line">const task_t thisTask &#x3D; mach_task_self();</span><br><span class="line">kern_return_t kr &#x3D; task_threads(thisTask, &amp;threads, &amp;threadsCount);</span><br></pre></td></tr></table></figure><p>task_threads 是一个关于线程组的函数，通过这个函数可以获得所有的线程信息数组 threads，线程总数 threadsCount。threads 数组里的线程信息有个结构体 thread_basic_info,该结构体里有一个字段 cpu_usage, cpu_usage 记录了 CPU 使用百分比。</p><p>其中thread_basic_info 结构体:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">struct thread_basic_info &#123;</span><br><span class="line">        time_value_t    user_time;      &#x2F;* user 运行的时间 *&#x2F;</span><br><span class="line">        time_value_t    system_time;    &#x2F;* system 运行的时间 *&#x2F;</span><br><span class="line">        integer_t       cpu_usage;      &#x2F;* CPU 使用百分比 *&#x2F;</span><br><span class="line">        policy_t        policy;         &#x2F;* 有效的计划策略 *&#x2F;</span><br><span class="line">        integer_t       run_state;      &#x2F;* run state (see below) *&#x2F;</span><br><span class="line">        integer_t       flags;          &#x2F;* various flags (see below) *&#x2F;</span><br><span class="line">        integer_t       suspend_count;  &#x2F;* suspend count for thread *&#x2F;</span><br><span class="line">        integer_t       sleep_time;     &#x2F;* 休眠时间 *&#x2F;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>通过 cpu_usage 字段，来遍历所有的线程，然后查看是哪个线程的 CPU 使用百分比过高了。</p><p>比如某个线程对应的CPU使用率值一直保持很高的数字,比如80%,那可以认为是该线程在耗电。</p><p>如果想具体到哪段代码引起了耗电问题, 那就记录该线程对应方法堆栈 ,并反向查找出是哪段代码的问题了。</p><p>通过以上步骤，可以快速定位到问题，有针对性地进行Code优化。</p><p>遍历检查多个线程信息里的CPU使用率的示例代码:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">+ (void)checkCPU_Usage &#123;</span><br><span class="line">    thread_act_array_t threads;</span><br><span class="line">    mach_msg_type_number_t threadsCount &#x3D; 0;</span><br><span class="line">    const task_t thisTask &#x3D; mach_task_self();</span><br><span class="line">    kern_return_t kr &#x3D; task_threads(thisTask, &amp;threads, &amp;threadsCount);</span><br><span class="line">    if (kr !&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; threadCount; i++) &#123;</span><br><span class="line">        thread_info_data_t threadInfo;</span><br><span class="line">        thread_basic_info_t threadBaseInfo;</span><br><span class="line">        mach_msg_type_number_t threadInfoCount &#x3D; THREAD_INFO_MAX;</span><br><span class="line">        if (thread_info((thread_act_t)threads[i], THREAD_BASIC_INFO, (thread_info_t)threadInfo, &amp;threadInfoCount) &#x3D;&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">            threadBaseInfo &#x3D; (thread_basic_info_t)threadInfo;</span><br><span class="line">            if (!(threadBaseInfo-&gt;flags &amp; TH_FLAGS_IDLE)) &#123;</span><br><span class="line">                integer_t cpuUsage &#x3D; threadBaseInfo-&gt;cpu_usage &#x2F; 10;</span><br><span class="line">                if (cpuUsage &gt; 80) &#123;</span><br><span class="line">                    NSString *stackStr &#x3D; stackOfThread(threads[i]);</span><br><span class="line">                  NSLog(@&quot;CPU 使用对应线程堆栈：\n%@&quot;,stackStr);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>(注:本文参考了戴铭的极客时间专栏)</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>App耗电量检测</title>
+    <url>/2020/04/05/2020-4-5/</url>
+    <content><![CDATA[<p>虽说现在iOS手机的电池续航越来越持久了,实在不行还有充电宝,快充设备,耗电量似乎不是问题,对用户感知不明显,用户会觉得是手机整体耗电量大,或者机子老化…</p>
+<p>作为iOS开发者,还是要对自己开发的App精益求精,所以耗电量问题实际上还是要研究一下的.查看耗电量问题,需要知道是代码哪个地方出现问题,或者说是哪个线程有问题.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">thread_act_array_t threads;</span><br><span class="line">mach_msg_type_number_t threadsCount &#x3D; 0;</span><br><span class="line">const task_t thisTask &#x3D; mach_task_self();</span><br><span class="line">kern_return_t kr &#x3D; task_threads(thisTask, &amp;threads, &amp;threadsCount);</span><br></pre></td></tr></table></figure>
+
+<p>task_threads 是一个关于线程组的函数，通过这个函数可以获得所有的线程信息数组 threads，线程总数 threadsCount。threads 数组里的线程信息有个结构体 thread_basic_info,该结构体里有一个字段 cpu_usage, cpu_usage 记录了 CPU 使用百分比。</p>
+<p>其中thread_basic_info 结构体:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct thread_basic_info &#123;</span><br><span class="line">        time_value_t    user_time;      &#x2F;* user 运行的时间 *&#x2F;</span><br><span class="line">        time_value_t    system_time;    &#x2F;* system 运行的时间 *&#x2F;</span><br><span class="line">        integer_t       cpu_usage;      &#x2F;* CPU 使用百分比 *&#x2F;</span><br><span class="line">        policy_t        policy;         &#x2F;* 有效的计划策略 *&#x2F;</span><br><span class="line">        integer_t       run_state;      &#x2F;* run state (see below) *&#x2F;</span><br><span class="line">        integer_t       flags;          &#x2F;* various flags (see below) *&#x2F;</span><br><span class="line">        integer_t       suspend_count;  &#x2F;* suspend count for thread *&#x2F;</span><br><span class="line">        integer_t       sleep_time;     &#x2F;* 休眠时间 *&#x2F;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>通过 cpu_usage 字段，来遍历所有的线程，然后查看是哪个线程的 CPU 使用百分比过高了。</p>
+<p>比如某个线程对应的CPU使用率值一直保持很高的数字,比如80%,那可以认为是该线程在耗电。</p>
+<p>如果想具体到哪段代码引起了耗电问题, 那就记录该线程对应方法堆栈 ,并反向查找出是哪段代码的问题了。</p>
+<p>通过以上步骤，可以快速定位到问题，有针对性地进行Code优化。</p>
+<p>遍历检查多个线程信息里的CPU使用率的示例代码:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+ (void)checkCPU_Usage &#123;</span><br><span class="line">    thread_act_array_t threads;</span><br><span class="line">    mach_msg_type_number_t threadsCount &#x3D; 0;</span><br><span class="line">    const task_t thisTask &#x3D; mach_task_self();</span><br><span class="line">    kern_return_t kr &#x3D; task_threads(thisTask, &amp;threads, &amp;threadsCount);</span><br><span class="line">    if (kr !&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; threadCount; i++) &#123;</span><br><span class="line">        thread_info_data_t threadInfo;</span><br><span class="line">        thread_basic_info_t threadBaseInfo;</span><br><span class="line">        mach_msg_type_number_t threadInfoCount &#x3D; THREAD_INFO_MAX;</span><br><span class="line">        if (thread_info((thread_act_t)threads[i], THREAD_BASIC_INFO, (thread_info_t)threadInfo, &amp;threadInfoCount) &#x3D;&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">            threadBaseInfo &#x3D; (thread_basic_info_t)threadInfo;</span><br><span class="line">            if (!(threadBaseInfo-&gt;flags &amp; TH_FLAGS_IDLE)) &#123;</span><br><span class="line">                integer_t cpuUsage &#x3D; threadBaseInfo-&gt;cpu_usage &#x2F; 10;</span><br><span class="line">                if (cpuUsage &gt; 80) &#123;</span><br><span class="line">                    NSString *stackStr &#x3D; stackOfThread(threads[i]);</span><br><span class="line">                  	NSLog(@&quot;CPU 使用对应线程堆栈：\n%@&quot;,stackStr);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(注:本文参考了戴铭的极客时间专栏)</p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>iOS中获取内存值的方法</title>
-      <link href="/2020/03/31/2020-3-31/"/>
-      <url>/2020/03/31/2020-3-31/</url>
-      
-        <content type="html"><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。</p><p>调用该函数需要导入头文件:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;sys&#x2F;sysctl.h&gt;</span><br><span class="line">#import &lt;mach&#x2F;mach.h&gt;</span><br></pre></td></tr></table></figure><p>代码如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct mach_task_basic_info info;</span><br><span class="line"></span><br><span class="line">mach_msg_type_number_t size &#x3D; sizeof(info);</span><br><span class="line"></span><br><span class="line">kern_return_t kl &#x3D; task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&amp;info, &amp;size);</span><br></pre></td></tr></table></figure><p>在这段代码中，名为 task_info_t  的结构里包含了一个 resident_size 字段，用于表示使用了多少内存。</p><p>当发现有App内存警告，可以借此获取当前 App 占用了多少内存。代码如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">float used_memory &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure><p>另外 ,也可以获取当前设备可用的内存, 代码如下:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vm_statistics_data_t vmStats;</span><br><span class="line">mach_msg_type_number_t infoCount &#x3D; HOST_VM_INFO_COUNT;</span><br><span class="line">kern_return_t kernReturn &#x3D; host_statistics(mach_host_self(), </span><br><span class="line">                                               HOST_VM_INFO, </span><br><span class="line">                                      (host_info_t)&amp;vmStats, </span><br><span class="line">                                                &amp;infoCount);</span><br><span class="line">float free_memory &#x3D; vm_page_size *vmStats.free_count;</span><br><span class="line">NSLog(@&quot;App可用 %f MB 内存&quot;, free_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS中获取内存值的方法</title>
+    <url>/2020/03/31/2020-3-31/</url>
+    <content><![CDATA[<p>iOS 系统提供了一个函数 task_info， 可以获取到当前任务的信息。</p>
+<p>调用该函数需要导入头文件:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;sys&#x2F;sysctl.h&gt;</span><br><span class="line">#import &lt;mach&#x2F;mach.h&gt;</span><br></pre></td></tr></table></figure>
+
+<p>代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct mach_task_basic_info info;</span><br><span class="line"></span><br><span class="line">mach_msg_type_number_t size &#x3D; sizeof(info);</span><br><span class="line"></span><br><span class="line">kern_return_t kl &#x3D; task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&amp;info, &amp;size);</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，名为 task_info_t  的结构里包含了一个 resident_size 字段，用于表示使用了多少内存。</p>
+<p>当发现有App内存警告，可以借此获取当前 App 占用了多少内存。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">float used_memory &#x3D; info.resident_size;</span><br><span class="line"></span><br><span class="line">NSLog(@&quot;App占用了 %f MB 的内存&quot;, used_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>
+
+<p>另外 ,也可以获取当前设备可用的内存, 代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vm_statistics_data_t vmStats;</span><br><span class="line">mach_msg_type_number_t infoCount &#x3D; HOST_VM_INFO_COUNT;</span><br><span class="line">kern_return_t kernReturn &#x3D; host_statistics(mach_host_self(), </span><br><span class="line">                                               HOST_VM_INFO, </span><br><span class="line">                                      (host_info_t)&amp;vmStats, </span><br><span class="line">                                                &amp;infoCount);</span><br><span class="line">float free_memory &#x3D; vm_page_size *vmStats.free_count;</span><br><span class="line">NSLog(@&quot;App可用 %f MB 内存&quot;, free_memory &#x2F; 1024.0f &#x2F; 1024.0f);</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>利用RunLoop监控卡顿</title>
-      <link href="/2020/03/28/2020-3-28/"/>
-      <url>/2020/03/28/2020-3-28/</url>
-      
-        <content type="html"><![CDATA[<p>利用RunLoop监控卡顿</p><p>通过学习了戴铭大神的专栏, Get到了在App开发过程中可以利用Runloop来监控App在运行期间的卡顿,卡顿问题是老生常谈 ,并且很影响用户体验,这里截取部分关键步骤,作为自己的参考.</p><p>RunLoop的6种状态</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;</span><br><span class="line">    kCFRunLoopEntry , &#x2F;&#x2F; 进入 loop</span><br><span class="line">    kCFRunLoopBeforeTimers , &#x2F;&#x2F; 触发 Timer 回调</span><br><span class="line">    kCFRunLoopBeforeSources , &#x2F;&#x2F; 触发 Source0 回调</span><br><span class="line">    kCFRunLoopBeforeWaiting , &#x2F;&#x2F; 等待 mach_port 消息</span><br><span class="line">    kCFRunLoopAfterWaiting ), &#x2F;&#x2F; 接收 mach_port 消息</span><br><span class="line">    kCFRunLoopExit , &#x2F;&#x2F; 退出 loop</span><br><span class="line">    kCFRunLoopAllActivities  &#x2F;&#x2F; loop 所有状态改变</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>监听 RunLoop，首先需要创建一个 CFRunLoopObserverContext 观察者</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CFRunLoopObserverContext context &#x3D; &#123;0,(__bridge void*)self,NULL,NULL&#125;;</span><br><span class="line">runLoopObserver &#x3D; CFRunLoopObserverCreate(kCFAllocatorDefault,kCFRunLoopAllActivities,YES,0,&amp;runLoopObserverCallBack,&amp;context);</span><br></pre></td></tr></table></figure><p>将创建好的观察者 runLoopObserver 添加到主线程 RunLoop 的 common 模式下观察。然后，创建一个持续的子线程专门用来监控主线程的 RunLoop 状态。一旦发现进入睡眠前的 kCFRunLoopBeforeSources 状态，或者唤醒后的状态 kCFRunLoopAfterWaiting，在设置的时间阈值内一直没有变化，即可判定为卡顿。接下来，就可以 dump 出堆栈的信息，从而进一步分析出具体是哪个方法的执行时间过长.</p><p>开启一个子线程监控的代码如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;创建子线程监控</span><br><span class="line">dispatch_async(dispatch_get_global_queue(0, 0), ^&#123;</span><br><span class="line">    &#x2F;&#x2F;子线程开启一个持续的 loop 用来进行监控</span><br><span class="line">    while (YES) &#123;</span><br><span class="line">        long semaphoreWait &#x3D; dispatch_semaphore_wait(dispatchSemaphore, dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC));</span><br><span class="line">        if (semaphoreWait !&#x3D; 0) &#123;</span><br><span class="line">            if (!runLoopObserver) &#123;</span><br><span class="line">                timeoutCount &#x3D; 0;</span><br><span class="line">                dispatchSemaphore &#x3D; 0;</span><br><span class="line">                runLoopActivity &#x3D; 0;</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;BeforeSources 和 AfterWaiting 这两个状态能够检测到是否卡顿</span><br><span class="line">            if (runLoopActivity &#x3D;&#x3D; kCFRunLoopBeforeSources || runLoopActivity &#x3D;&#x3D; kCFRunLoopAfterWaiting) &#123;</span><br><span class="line">                &#x2F;&#x2F;将堆栈信息上报服务器的代码放到这里</span><br><span class="line">            &#125; &#x2F;&#x2F;end activity</span><br><span class="line">        &#125;&#x2F;&#x2F; end semaphore wait</span><br><span class="line">        timeoutCount &#x3D; 0;</span><br><span class="line">    &#125;&#x2F;&#x2F; end while</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><p>获取卡顿的方法堆栈信息</p><p>获取堆栈信息的一种方法是直接调用系统函数。这种方法的优点在于，性能消耗小。但是，它只能够获取简单的信息，也没有办法配合 dSYM 来获取具体是哪行代码出了问题，而且能够获取的信息类型也有限。这种方法，因为性能比较好，所以适用于观察大盘统计卡顿情况，而不是想要找到卡顿原因的场景。直接调用系统函数方法的主要思路是：用 signal 进行错误信息的获取。具体代码如下:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">static int s_fatal_signals[] &#x3D; &#123;</span><br><span class="line">    SIGABRT,</span><br><span class="line">    SIGBUS,</span><br><span class="line">    SIGFPE,</span><br><span class="line">    SIGILL,</span><br><span class="line">    SIGSEGV,</span><br><span class="line">    SIGTRAP,</span><br><span class="line">    SIGTERM,</span><br><span class="line">    SIGKILL,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">static int s_fatal_signal_num &#x3D; sizeof(s_fatal_signals) &#x2F; sizeof(s_fatal_signals[0]);</span><br><span class="line"></span><br><span class="line">void UncaughtExceptionHandler(NSException *exception) &#123;</span><br><span class="line">    NSArray *exceptionArray &#x3D; [exception callStackSymbols]; &#x2F;&#x2F;得到当前调用栈信息</span><br><span class="line">    NSString *exceptionReason &#x3D; [exception reason];       &#x2F;&#x2F;非常重要，就是崩溃的原因</span><br><span class="line">    NSString *exceptionName &#x3D; [exception name];           &#x2F;&#x2F;异常类型</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void SignalHandler(int code)</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;signal handler &#x3D; %d&quot;,code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void InitCrashReport()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F;系统错误信号捕获</span><br><span class="line">    for (int i &#x3D; 0; i &lt; s_fatal_signal_num; ++i) &#123;</span><br><span class="line">        signal(s_fatal_signals[i], SignalHandler);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;oc未捕获异常的捕获</span><br><span class="line">    NSSetUncaughtExceptionHandler(&amp;UncaughtExceptionHandler);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        InitCrashReport();</span><br><span class="line">        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));</span><br></pre></td></tr></table></figure><p>另一种方法是，直接用 PLCrashReporter这个开源的第三方库来获取堆栈信息。这种方法的特点是，能够定位到问题代码的具体位置，而且性能消耗也不大。所以，也是戴铭大神推荐的获取堆栈信息的方法。具体如何使用 PLCrashReporter 来获取堆栈信息，代码如下所示：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 获取数据</span><br><span class="line">NSData *lagData &#x3D; [[[PLCrashReporter alloc] initWithConfiguration:[[PLCrashReporterConfig alloc] initWithSignalHandlerType:PLCrashReporterSignalHandlerTypeBSD symbolicationStrategy:PLCrashReporterSymbolicationStrategyAll]] generateLiveReport];</span><br><span class="line">&#x2F;&#x2F; 转换成 PLCrashReport 对象</span><br><span class="line">PLCrashReport *lagReport &#x3D; [[PLCrashReport alloc] initWithData:lagData error:NULL];</span><br><span class="line">&#x2F;&#x2F; 进行字符串格式化处理</span><br><span class="line">NSString *lagReportString &#x3D; [PLCrashReportTextFormatter stringValueForCrashReport:lagReport withTextFormat:PLCrashReportTextFormatiOS];</span><br><span class="line">&#x2F;&#x2F;将字符串上传服务器</span><br><span class="line">NSLog(@&quot;lag happen, detail below: \n %@&quot;,lagReportString);</span><br></pre></td></tr></table></figure><p>搜集到卡顿的方法堆栈信息以后，分析并解决卡顿问题。</p><p>(以上内容摘自戴铭的极客时间专栏)</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>利用RunLoop监控卡顿</title>
+    <url>/2020/03/28/2020-3-28/</url>
+    <content><![CDATA[<p>利用RunLoop监控卡顿</p>
+<p>通过学习了戴铭大神的专栏, Get到了在App开发过程中可以利用Runloop来监控App在运行期间的卡顿,卡顿问题是老生常谈 ,并且很影响用户体验,这里截取部分关键步骤,作为自己的参考.</p>
+<p>RunLoop的6种状态</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;</span><br><span class="line">    kCFRunLoopEntry , &#x2F;&#x2F; 进入 loop</span><br><span class="line">    kCFRunLoopBeforeTimers , &#x2F;&#x2F; 触发 Timer 回调</span><br><span class="line">    kCFRunLoopBeforeSources , &#x2F;&#x2F; 触发 Source0 回调</span><br><span class="line">    kCFRunLoopBeforeWaiting , &#x2F;&#x2F; 等待 mach_port 消息</span><br><span class="line">    kCFRunLoopAfterWaiting ), &#x2F;&#x2F; 接收 mach_port 消息</span><br><span class="line">    kCFRunLoopExit , &#x2F;&#x2F; 退出 loop</span><br><span class="line">    kCFRunLoopAllActivities  &#x2F;&#x2F; loop 所有状态改变</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>监听 RunLoop，首先需要创建一个 CFRunLoopObserverContext 观察者</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CFRunLoopObserverContext context &#x3D; &#123;0,(__bridge void*)self,NULL,NULL&#125;;</span><br><span class="line">runLoopObserver &#x3D; CFRunLoopObserverCreate(kCFAllocatorDefault,kCFRunLoopAllActivities,YES,0,&amp;runLoopObserverCallBack,&amp;context);</span><br></pre></td></tr></table></figure>
+
+<p>将创建好的观察者 runLoopObserver 添加到主线程 RunLoop 的 common 模式下观察。然后，创建一个持续的子线程专门用来监控主线程的 RunLoop 状态。一旦发现进入睡眠前的 kCFRunLoopBeforeSources 状态，或者唤醒后的状态 kCFRunLoopAfterWaiting，在设置的时间阈值内一直没有变化，即可判定为卡顿。接下来，就可以 dump 出堆栈的信息，从而进一步分析出具体是哪个方法的执行时间过长.</p>
+<p>开启一个子线程监控的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;创建子线程监控</span><br><span class="line">dispatch_async(dispatch_get_global_queue(0, 0), ^&#123;</span><br><span class="line">    &#x2F;&#x2F;子线程开启一个持续的 loop 用来进行监控</span><br><span class="line">    while (YES) &#123;</span><br><span class="line">        long semaphoreWait &#x3D; dispatch_semaphore_wait(dispatchSemaphore, dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC));</span><br><span class="line">        if (semaphoreWait !&#x3D; 0) &#123;</span><br><span class="line">            if (!runLoopObserver) &#123;</span><br><span class="line">                timeoutCount &#x3D; 0;</span><br><span class="line">                dispatchSemaphore &#x3D; 0;</span><br><span class="line">                runLoopActivity &#x3D; 0;</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            &#x2F;&#x2F;BeforeSources 和 AfterWaiting 这两个状态能够检测到是否卡顿</span><br><span class="line">            if (runLoopActivity &#x3D;&#x3D; kCFRunLoopBeforeSources || runLoopActivity &#x3D;&#x3D; kCFRunLoopAfterWaiting) &#123;</span><br><span class="line">                &#x2F;&#x2F;将堆栈信息上报服务器的代码放到这里</span><br><span class="line">            &#125; &#x2F;&#x2F;end activity</span><br><span class="line">        &#125;&#x2F;&#x2F; end semaphore wait</span><br><span class="line">        timeoutCount &#x3D; 0;</span><br><span class="line">    &#125;&#x2F;&#x2F; end while</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>获取卡顿的方法堆栈信息</p>
+<p>获取堆栈信息的一种方法是直接调用系统函数。这种方法的优点在于，性能消耗小。但是，它只能够获取简单的信息，也没有办法配合 dSYM 来获取具体是哪行代码出了问题，而且能够获取的信息类型也有限。这种方法，因为性能比较好，所以适用于观察大盘统计卡顿情况，而不是想要找到卡顿原因的场景。直接调用系统函数方法的主要思路是：用 signal 进行错误信息的获取。具体代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">static int s_fatal_signals[] &#x3D; &#123;</span><br><span class="line">    SIGABRT,</span><br><span class="line">    SIGBUS,</span><br><span class="line">    SIGFPE,</span><br><span class="line">    SIGILL,</span><br><span class="line">    SIGSEGV,</span><br><span class="line">    SIGTRAP,</span><br><span class="line">    SIGTERM,</span><br><span class="line">    SIGKILL,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">static int s_fatal_signal_num &#x3D; sizeof(s_fatal_signals) &#x2F; sizeof(s_fatal_signals[0]);</span><br><span class="line"></span><br><span class="line">void UncaughtExceptionHandler(NSException *exception) &#123;</span><br><span class="line">    NSArray *exceptionArray &#x3D; [exception callStackSymbols]; &#x2F;&#x2F;得到当前调用栈信息</span><br><span class="line">    NSString *exceptionReason &#x3D; [exception reason];       &#x2F;&#x2F;非常重要，就是崩溃的原因</span><br><span class="line">    NSString *exceptionName &#x3D; [exception name];           &#x2F;&#x2F;异常类型</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void SignalHandler(int code)</span><br><span class="line">&#123;</span><br><span class="line">    NSLog(@&quot;signal handler &#x3D; %d&quot;,code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void InitCrashReport()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F;系统错误信号捕获</span><br><span class="line">    for (int i &#x3D; 0; i &lt; s_fatal_signal_num; ++i) &#123;</span><br><span class="line">        signal(s_fatal_signals[i], SignalHandler);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;oc未捕获异常的捕获</span><br><span class="line">    NSSetUncaughtExceptionHandler(&amp;UncaughtExceptionHandler);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        InitCrashReport();</span><br><span class="line">        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));</span><br></pre></td></tr></table></figure>
+
+<p>另一种方法是，直接用 PLCrashReporter这个开源的第三方库来获取堆栈信息。这种方法的特点是，能够定位到问题代码的具体位置，而且性能消耗也不大。所以，也是戴铭大神推荐的获取堆栈信息的方法。具体如何使用 PLCrashReporter 来获取堆栈信息，代码如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 获取数据</span><br><span class="line">NSData *lagData &#x3D; [[[PLCrashReporter alloc] initWithConfiguration:[[PLCrashReporterConfig alloc] initWithSignalHandlerType:PLCrashReporterSignalHandlerTypeBSD symbolicationStrategy:PLCrashReporterSymbolicationStrategyAll]] generateLiveReport];</span><br><span class="line">&#x2F;&#x2F; 转换成 PLCrashReport 对象</span><br><span class="line">PLCrashReport *lagReport &#x3D; [[PLCrashReport alloc] initWithData:lagData error:NULL];</span><br><span class="line">&#x2F;&#x2F; 进行字符串格式化处理</span><br><span class="line">NSString *lagReportString &#x3D; [PLCrashReportTextFormatter stringValueForCrashReport:lagReport withTextFormat:PLCrashReportTextFormatiOS];</span><br><span class="line">&#x2F;&#x2F;将字符串上传服务器</span><br><span class="line">NSLog(@&quot;lag happen, detail below: \n %@&quot;,lagReportString);</span><br></pre></td></tr></table></figure>
+
+<p>搜集到卡顿的方法堆栈信息以后，分析并解决卡顿问题。</p>
+<p>(以上内容摘自戴铭的极客时间专栏)</p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Git在终端中的一些常用命令</title>
-      <link href="/2020/03/26/2020-3-26/"/>
-      <url>/2020/03/26/2020-3-26/</url>
-      
-        <content type="html"><![CDATA[<p>Git在终端中的一些常用命令</p><p>公司以自有服务器搭建gitLab用于代码托管, 虽说有像source tree, Tower等非常好用的可视化git管理软件,但也有很多人热衷于在终端上使用git命令,有种返璞归真的意思,今天就自己简单回顾了一些常用的git命令, 毕竟好记性不如烂笔头.</p><p>git mv xxx kkkk</p><p>#简便修改git文件的文件名</p><p>然后直接commit 提交</p><p>git log —oneline</p><p>#查看简便log历史</p><p>git log —all</p><p>#查看所有log所有分支 </p><p>git log —graph</p><p>#查看可视化log历史</p><p>git log —n4</p><p>#查看所有log记录的前4条</p><p>(commit:保存的快照,tree:相当于文件夹 ,blob:相当于文件)</p><p>git cat-file -p 1234567..(hash值)</p><p>#通过hash值查看git文件 </p><p>git cat-file -t 1234567..(hash值)</p><p>#通过hash值查看git文件格式(commit/tree/blob)</p><p>git diff 123456 7891011</p><p>#通过两个commit的hash值比较变更差异</p><p>git diff HEAD HEAD^1^1 (等同于git diff HEAD HEAD^^  或git diff HEAD HEAD~2)</p><p>#比较当前HEAD和父HEAD的父HEAD的变更差异</p><p>git branch -D 123456(分支名)</p><p>#删除指定名字的分支</p><p>git commit -amend </p><p>#对最近的一次commit的message做修改变更</p><p>git rebase -i 1234(需要修改的commit的父commit)</p><p>#对历史任意一次commit做变更</p><p>git rebase -i  </p><p>#pick改为s 进行commit合并</p><p>git diff —cached</p><p>#比较暂存区和HEAD所含文件的差异</p><p>git reset HEAD</p><p>#让暂存区恢复成和HEAD的一样,命令后可跟具体</p><p>文件名,即可具体到指定文件</p><p>git checkout — 文件名</p><p>#让工作区的文件恢复为和暂存区一样</p><p>git reset —hard 123456(commit的hash值)</p><p>#消除最近到指定某次commit的提交</p><p>git rm filename</p><p>#删除指定文件并同步到暂存区</p><p>git stash</p><p>#提交工作区文件到暂存区</p><p>git stash list</p><p>#查看暂存区文件列表</p><p>git stash pop</p><p>#将暂存区文件恢复到工作区,且暂存区内容清除</p><p>git stash apply</p><p>##将暂存区文件恢复到工作区,且暂存区内容保留</p><p>.gitignore 指定不需要git管理的文件</p><p>git clone </p><p>#git仓库备份到本地</p><p>git push</p><p>#本地提交到git仓库</p><p>git remote -v</p><p>#查看本地和远程建立联系的列表</p><p>git merge</p><p>#由git智能合并</p><p>git push -f</p><p>#强制更新(不建议使用)</p><p>……暂时写这么多吧</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git在终端中的一些常用命令</title>
+    <url>/2020/03/26/2020-3-26/</url>
+    <content><![CDATA[<p>Git在终端中的一些常用命令</p>
+<p>公司以自有服务器搭建gitLab用于代码托管, 虽说有像source tree, Tower等非常好用的可视化git管理软件,但也有很多人热衷于在终端上使用git命令,有种返璞归真的意思,今天就自己简单回顾了一些常用的git命令, 毕竟好记性不如烂笔头.</p>
+<p>git mv xxx kkkk</p>
+<p>#简便修改git文件的文件名</p>
+<p>然后直接commit 提交</p>
+<p>git log —oneline</p>
+<p>#查看简便log历史</p>
+<p>git log —all</p>
+<p>#查看所有log所有分支 </p>
+<p>git log —graph</p>
+<p>#查看可视化log历史</p>
+<p>git log —n4</p>
+<p>#查看所有log记录的前4条</p>
+<p>(commit:保存的快照,tree:相当于文件夹 ,blob:相当于文件)</p>
+<p>git cat-file -p 1234567..(hash值)</p>
+<p>#通过hash值查看git文件 </p>
+<p>git cat-file -t 1234567..(hash值)</p>
+<p>#通过hash值查看git文件格式(commit/tree/blob)</p>
+<p>git diff 123456 7891011</p>
+<p>#通过两个commit的hash值比较变更差异</p>
+<p>git diff HEAD HEAD^1^1 (等同于git diff HEAD HEAD^^  或git diff HEAD HEAD~2)</p>
+<p>#比较当前HEAD和父HEAD的父HEAD的变更差异</p>
+<p>git branch -D 123456(分支名)</p>
+<p>#删除指定名字的分支</p>
+<p>git commit -amend </p>
+<p>#对最近的一次commit的message做修改变更</p>
+<p>git rebase -i 1234(需要修改的commit的父commit)</p>
+<p>#对历史任意一次commit做变更</p>
+<p>git rebase -i  </p>
+<p>#pick改为s 进行commit合并</p>
+<p>git diff —cached</p>
+<p>#比较暂存区和HEAD所含文件的差异</p>
+<p>git reset HEAD</p>
+<p>#让暂存区恢复成和HEAD的一样,命令后可跟具体</p>
+<p>文件名,即可具体到指定文件</p>
+<p>git checkout — 文件名</p>
+<p>#让工作区的文件恢复为和暂存区一样</p>
+<p>git reset —hard 123456(commit的hash值)</p>
+<p>#消除最近到指定某次commit的提交</p>
+<p>git rm filename</p>
+<p>#删除指定文件并同步到暂存区</p>
+<p>git stash</p>
+<p>#提交工作区文件到暂存区</p>
+<p>git stash list</p>
+<p>#查看暂存区文件列表</p>
+<p>git stash pop</p>
+<p>#将暂存区文件恢复到工作区,且暂存区内容清除</p>
+<p>git stash apply</p>
+<p>##将暂存区文件恢复到工作区,且暂存区内容保留</p>
+<p>.gitignore 指定不需要git管理的文件</p>
+<p>git clone </p>
+<p>#git仓库备份到本地</p>
+<p>git push</p>
+<p>#本地提交到git仓库</p>
+<p>git remote -v</p>
+<p>#查看本地和远程建立联系的列表</p>
+<p>git merge</p>
+<p>#由git智能合并</p>
+<p>git push -f</p>
+<p>#强制更新(不建议使用)</p>
+<p>……暂时写这么多吧</p>
+]]></content>
       <categories>
-          
-          <category> 工具 </category>
-          
+        <category>工具</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于静态分析工具 infer 的简单使用</title>
-      <link href="/2020/03/05/2020-3-5/"/>
-      <url>/2020/03/05/2020-3-5/</url>
-      
-        <content type="html"><![CDATA[<p>静态分析工具 infer 的简单使用</p><p>在iOS开发中或许会用到一款用于静态分析的工具 - infer, 对于这个工具的出处和原理,网上也有相关介绍.</p><p>这里,简单记录一下使用步骤:</p><p>1)安装:</p><p>​    终端输入:</p><p>​    brew install infer</p><p>​    涉及到软件更新,依赖库安装,安装时间可能较长,具体依网络状况而定.</p><p>2)使用:</p><p>​    终端进入项目目录:</p><p>​    $ cd &lt;项目所在目录&gt;</p><p>​    使用如下命令编译:</p><p>​    infer – xcodebuild -target 项目名 -configuration Debug -sdk iphonesimulator</p><p>​    接下来终端中会出现日志信息打印.</p><p>3)结果</p><p>​    在项目所在目录出现 “build”及”infer-out”目录</p><p>​    “infer-out”文件夹中有txt,json等相关文件,分析bugs.txt.</p><p>4)再次使用</p><p>​    由于infer有两种模式:增量与非增量模式</p><p>​    a)增量模式:是在第一次运行 “2)中的编译命令” 后,产生了build和infer-out文件夹,</p><p>​    再次执行该编译命令时,此时就是增量模式.当项目的代码没有改动时,则此时不会有编译结果, 如果项目代码有新的改动之处,此次编译就只产生新的编译结果.</p><p>​    b)非增量模式:当再次执行编译命令前,删除了build和infer-out两个文件夹的时候,执行命令,则会输出所有的编译信息,相当于首次编译的情形.</p><p>​    所以手动使用非增量模式的方法:</p><p>​    一: 执行编译命令前,先删除build和infer-out文件夹(如果有的话)</p><p>​    二: 在编译命令的最后追加”clean”, 即:</p><p>​    xcodebuild -target 项目名称 -configuration Debug -sdk iphonesimulator clean</p><p>​    对于infer静态分析的原理,感兴趣可以google一下.</p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于静态分析工具 infer 的简单使用</title>
+    <url>/2020/03/05/2020-3-5/</url>
+    <content><![CDATA[<p>静态分析工具 infer 的简单使用</p>
+<p>在iOS开发中或许会用到一款用于静态分析的工具 - infer, 对于这个工具的出处和原理,网上也有相关介绍.</p>
+<p>这里,简单记录一下使用步骤:</p>
+<p>1)安装:</p>
+<p>​    终端输入:</p>
+<p>​    brew install infer</p>
+<p>​    涉及到软件更新,依赖库安装,安装时间可能较长,具体依网络状况而定.</p>
+<p>2)使用:</p>
+<p>​    终端进入项目目录:</p>
+<p>​    $ cd &lt;项目所在目录&gt;</p>
+<p>​    使用如下命令编译:</p>
+<p>​    infer – xcodebuild -target 项目名 -configuration Debug -sdk iphonesimulator</p>
+<p>​    接下来终端中会出现日志信息打印.</p>
+<p>3)结果</p>
+<p>​    在项目所在目录出现 “build”及”infer-out”目录</p>
+<p>​    “infer-out”文件夹中有txt,json等相关文件,分析bugs.txt.</p>
+<p>4)再次使用</p>
+<p>​    由于infer有两种模式:增量与非增量模式</p>
+<p>​    a)增量模式:是在第一次运行 “2)中的编译命令” 后,产生了build和infer-out文件夹,</p>
+<p>​    再次执行该编译命令时,此时就是增量模式.当项目的代码没有改动时,则此时不会有编译结果, 如果项目代码有新的改动之处,此次编译就只产生新的编译结果.</p>
+<p>​    b)非增量模式:当再次执行编译命令前,删除了build和infer-out两个文件夹的时候,执行命令,则会输出所有的编译信息,相当于首次编译的情形.</p>
+<p>​    所以手动使用非增量模式的方法:</p>
+<p>​    一: 执行编译命令前,先删除build和infer-out文件夹(如果有的话)</p>
+<p>​    二: 在编译命令的最后追加”clean”, 即:</p>
+<p>​    xcodebuild -target 项目名称 -configuration Debug -sdk iphonesimulator clean</p>
+<p>​    对于infer静态分析的原理,感兴趣可以google一下.</p>
+]]></content>
       <categories>
-          
-          <category> iOS </category>
-          
+        <category>iOS</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 开发工具 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>随笔一则</title>
-      <link href="/2020/02/16/2020-2-16/"/>
-      <url>/2020/02/16/2020-2-16/</url>
-      
-        <content type="html"><![CDATA[<p>​    昨晚外面还在风雨交加,今天就是个大太阳,就是温度有点低.</p><p>​    看今天的网络,仿佛一场自发的摄影大赛,各种抓拍的雪景,虽说疫情当前,但这场短暂的春雪还是给广大网友们带来了一丝快乐,毕竟大家都在家憋坏了……</p><p>​    昨晚还看到东南亚一些国家发出了”放弃疫情防治措施”的新闻,貌似那边就是百姓该吃吃该喝喝,社会正常运作的意思,想来疫情程度不同,号称新冠病杀伤力不如Sara,于是放弃抵抗?!</p><p>​    昨晚西甲的一场比赛,赛前为”中国加油,武汉加油”的仪式还是挺暖心的…咱武汉同胞要加油!</p><p>​    </p><p>​    </p>]]></content>
-      
-      
+      <tags>
+        <tag>开发工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>随笔一则</title>
+    <url>/2020/02/16/2020-2-16/</url>
+    <content><![CDATA[<p>​    昨晚外面还在风雨交加,今天就是个大太阳,就是温度有点低.</p>
+<p>​    看今天的网络,仿佛一场自发的摄影大赛,各种抓拍的雪景,虽说疫情当前,但这场短暂的春雪还是给广大网友们带来了一丝快乐,毕竟大家都在家憋坏了……</p>
+<p>​    昨晚还看到东南亚一些国家发出了”放弃疫情防治措施”的新闻,貌似那边就是百姓该吃吃该喝喝,社会正常运作的意思,想来疫情程度不同,号称新冠病杀伤力不如Sara,于是放弃抵抗?!</p>
+<p>​    昨晚西甲的一场比赛,赛前为”中国加油,武汉加油”的仪式还是挺暖心的…咱武汉同胞要加油!</p>
+<p>​    </p>
+<p>​    </p>
+]]></content>
       <categories>
-          
-          <category> 生活 </category>
-          
+        <category>生活</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 日常 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>开篇</title>
-      <link href="/2020/02/15/2020-2-15/"/>
-      <url>/2020/02/15/2020-2-15/</url>
-      
-        <content type="html"><![CDATA[<p>2020年开年的事,大家都知道了,目前仍然在经历着…</p><p>由于各方面政策的原因,一直宅着,那就找点事情捣鼓捣鼓吧:买了云主机,开了VPN,</p><p>订了网上课程…其实我只是想搭个个人博客,那么,这就是 2020年 的第一篇博文吧.</p>]]></content>
-      
-      
+      <tags>
+        <tag>日常</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>开篇</title>
+    <url>/2020/02/15/2020-2-15/</url>
+    <content><![CDATA[<p>2020年开年的事,大家都知道了,目前仍然在经历着…</p>
+<p>由于各方面政策的原因,一直宅着,那就找点事情捣鼓捣鼓吧:买了云主机,开了VPN,</p>
+<p>订了网上课程…其实我只是想搭个个人博客,那么,这就是 2020年 的第一篇博文吧.</p>
+]]></content>
       <categories>
-          
-          <category> 生活 </category>
-          
+        <category>生活</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 日常 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-  
-  
+      <tags>
+        <tag>日常</tag>
+      </tags>
+  </entry>
 </search>

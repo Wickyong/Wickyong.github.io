@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="一名iOS开发爱好者"><meta name="keywords" content="iOS,开发者,编程,捣鼓,Developer,Apple"><link rel="stylesheet" type="text/css" href="//fonts.loli.net/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style-dark.css?v=2.0.5"><link rel="stylesheet" type="text/css" href="/css/highlight-dark.css?v=2.0.5"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"><title>Flutter与iOS的混合开发 | Wickyong的博客</title><meta name="generator" content="Hexo 4.2.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Flutter与iOS的混合开发</h1><a id="logo" href="/.">Wickyong的博客</a><p class="description">iOS是起点,不是终点</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">Flutter与iOS的混合开发</h1><div class="post-meta"><a href="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/#comments" class="comment-count"></a><p><span class="date">Apr 16, 2021</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><h3 id="FLutter与iOS混合开发的三种方式"><a href="#FLutter与iOS混合开发的三种方式" class="headerlink" title="FLutter与iOS混合开发的三种方式"></a>FLutter与iOS混合开发的三种方式</h3><h4 id="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"><a href="#本文记载了原生iOS项目下集成Flutter的混合开发的三种方式" class="headerlink" title="本文记载了原生iOS项目下集成Flutter的混合开发的三种方式"></a>本文记载了原生iOS项目下集成Flutter的混合开发的三种方式</h4><p>以下均以示例说明：<br>环境说明: Macbook air M1，iPhone X</p>
 <h5 id="原生嵌套Flutter-Module"><a href="#原生嵌套Flutter-Module" class="headerlink" title="原生嵌套Flutter Module"></a>原生嵌套Flutter Module</h5><p>步骤：</p>
 <ol>
-<li>Android Studio(简称AS)创建Flutter_Module工程(创建完编译一下))<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module.png" class="" title="创建flutter_module"><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module.png" alt="">)创建NativeDemo工程<img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BANative.png" alt=""></li>
+<li>Android Studio(简称AS)创建Flutter_Module工程(创建完编译一下))<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module.png" class="" title="创建flutter_module}{% asset_img 创建Native.png 创建Native"></li>
 <li>终端CD /NativeDemo 中，执行 </li>
 </ol>
 <figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pod init</span></span><br></pre></td></tr></table></figure>
@@ -10,42 +10,78 @@
 <li>终端执行<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod <span class="keyword">install</span></span><br></pre></td></tr></table></figure></li>
 <li>打开NativeDemo.xcworkspace，打开ViewController，导入&lt;Flutter/Flutter.h&gt;添加<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    UIButton *flutterBtn = [[UIButton alloc]<span class="string">initWithFrame:</span>CGRectMake(<span class="number">100</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">100</span>)];</span><br><span class="line">    </span><br><span class="line">    [flutterBtn <span class="string">setTitle:</span>@<span class="string">"点击跳转至Flutter"</span> <span class="string">forState:</span>UIControlStateNormal];</span><br><span class="line">    </span><br><span class="line">    flutterBtn.backgroundColor = [UIColor blueColor];</span><br><span class="line">    </span><br><span class="line">    [flutterBtn <span class="string">addTarget:</span>self <span class="string">action:</span><span class="meta">@selector</span>(<span class="string">presentToFlutter:</span>) <span class="string">forControlEvents:</span>UIControlEventTouchUpInside];</span><br><span class="line">    </span><br><span class="line">    [self.view <span class="string">addSubview:</span>flutterBtn];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 另外添加点击事件<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)<span class="string">presentToFlutter :</span>(UIButton *)sender&#123;</span><br><span class="line">    FlutterViewController * vc = [[FlutterViewController alloc]init];</span><br><span class="line">    </span><br><span class="line">    [self <span class="string">presentViewController:</span>vc <span class="string">animated:</span>YES <span class="string">completion:</span>nil];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>真机运行结果：<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Native2Flutter.gif" alt=""></li>
+<li>真机运行结果：<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Native2Flutter.gif" class="" title="Native2Flutter">
+
+</li>
 </ol>
 <p>8.原生iOS项目嵌入Flutter完成</p>
-<h6 id="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"><a href="#此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。" class="headerlink" title="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"></a>此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。</h6><h5 id="flutter编译产物framework嵌入原生项目"><a href="#flutter编译产物framework嵌入原生项目" class="headerlink" title="flutter编译产物framework嵌入原生项目"></a>flutter编译产物framework嵌入原生项目</h5><p>步骤：<br>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module%E5%92%8CNative.png" alt=""></p>
+<h6 id="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"><a href="#此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。" class="headerlink" title="此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。"></a>此方法要求原生iOS开发人员搭建Flutter运行环境，且本机flutter版本号，安装路径要与flutter工程师环境保持一致，较为麻烦，且与原生项目的耦合度较高。</h6><h5 id="flutter编译产物framework嵌入原生项目"><a href="#flutter编译产物framework嵌入原生项目" class="headerlink" title="flutter编译产物framework嵌入原生项目"></a>flutter编译产物framework嵌入原生项目</h5><p>步骤：<br>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E5%88%9B%E5%BB%BAflutter_module%E5%92%8CNative.png" class="" title="创建flutter_module和Native">
+
 <p>2.进入当前的flutter_module目录，终端输入</p>
 <figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flutter build ios-framework <span class="params">--xcframework</span> <span class="params">--no-universal</span> <span class="params">--output=</span><span class="string">../Flutter_Frameworks</span></span><br></pre></td></tr></table></figure>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks.png" alt=""><br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks2.png" alt=""></p>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks3.png" alt=""></p>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks4.png" alt=""></p>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks5.png" alt=""></p>
-<p>3.将Flutter_frameworks文件夹拖入NativeDemo<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks6.png" alt=""></p>
-<p>4.打开NativeDemo/TARGETS/Build Setting, 搜索栏搜索“Framework Search”<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks7.png" alt=""></p>
-<p>5.输入路径参数$(inherited) 和 $(PROJECT_DIR)/Flutter_Frameworks/Release<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks8.png" alt=""></p>
-<p>6.NativeDemo目录创建虚文件夹Frameworks<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks9.png" alt=""></p>
-<p>7.将Flutter_Framework/Release里的App.xcframework和Flutter.xcframework拖入NativeDemo项目中<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks10.png" alt=""></p>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks11.png" alt=""></p>
-<p>8.这样framework栏里就显示<img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks12.png" alt=""></p>
-<p>9.将 DO Not Embed 改成 Embed &amp; Sign<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks13.png" alt=""></p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks.png" class="" title="终端生成frameworks">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks2.png" class="" title="终端生成frameworks2">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks3.png" class="" title="终端生成frameworks3">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks4.png" class="" title="终端生成frameworks4">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks5.png" class="" title="终端生成frameworks5">
+
+<p>3.将Flutter_frameworks文件夹拖入NativeDemo</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks6.png" class="" title="终端生成frameworks6">
+
+<p>4.打开NativeDemo/TARGETS/Build Setting, 搜索栏搜索“Framework Search”</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks7.png" class="" title="终端生成frameworks7">
+
+<p>5.输入路径参数$(inherited) 和 $(PROJECT_DIR)/Flutter_Frameworks/Release</p>
+
+
+<p>6.NativeDemo目录创建虚文件夹Frameworks</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks9.png" class="" title="终端生成frameworks9">
+
+<p>7.将Flutter_Framework/Release里的App.xcframework和Flutter.xcframework拖入NativeDemo项目中</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks10.png" class="" title="终端生成frameworks10">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks11.png" class="" title="终端生成frameworks11">
+
+<p>8.这样framework栏里就显示<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks12.png" class="" title="终端生成frameworks12"></p>
+<p>9.将 DO Not Embed 改成 Embed &amp; Sign</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/%E7%BB%88%E7%AB%AF%E7%94%9F%E6%88%90frameworks13.png" class="" title="终端生成frameworks13">
+
 <p>10.同上个示例一样，写入按钮代码,运行，能得到一样的运行结果</p>
 <h6 id="分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境"><a href="#分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境" class="headerlink" title="分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境"></a>分析：该嵌入方案相比第一种方式来说，耦合度已经很低，基本对原生无污染，也不要求原生开发人员去搭建Flutter环境</h6><h5 id="CocoaPods与Framework配合混合开发"><a href="#CocoaPods与Framework配合混合开发" class="headerlink" title="CocoaPods与Framework配合混合开发"></a>CocoaPods与Framework配合混合开发</h5><p>鉴于App.framework更新频繁，而Flutter.framework更新较少，所以有了第三种方式<br>步骤：</p>
 <p>1.AS创建flutter_module(创建完编译一下),Xcode创建NativeDemo<br>2.进入flutter_module目录，终端输入</p>
 <figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flutter build ios-framework <span class="params">--cocoapods</span> <span class="params">--xcframework</span> <span class="params">--no-universal</span> <span class="params">--output=</span><span class="string">../Framework</span></span><br></pre></td></tr></table></figure>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework.png" alt=""></p>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework2.png" alt=""></p>
-<p>3.发现编译的产物跟第二种方式还是有区别的<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework4.png" alt=""></p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework.png" class="" title="Cocoa&amp;framework">
+
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework2.png" class="" title="Cocoa&amp;framework2">
+
+<p>3.发现编译的产物跟第二种方式还是有区别的</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework4.png" class="" title="Cocoa&amp;framework4">
+
+
 <p>4.进入NativeDemo,终端执行</p>
 <figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pod init</span></span><br></pre></td></tr></table></figure>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework5.png" alt=""></p>
-<p>5.将生成的Framework文件夹拖入NativeDemo目录<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework7.png" alt=""></p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework5.png" class="" title="Cocoa&amp;framework5">
+
+<p>5.将生成的Framework文件夹拖入NativeDemo目录</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework7.png" class="" title="Cocoa&amp;framework7">
+
 <p>6.打开podfile,编辑如下一行代码</p>
 <figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod <span class="string">'Flutter'</span>, :<span class="function"><span class="params">podspec</span> =&gt;</span> <span class="string">'Framework/Debug/Flutter.podspec'</span></span><br></pre></td></tr></table></figure>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework6.png" alt=""></p>
-<p>使用Framework/Debug文件夹<br><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework8.png" alt=""></p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework6.png" class="" title="Cocoa&amp;framework6">
+
+<p>使用Framework/Debug文件夹</p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework8.png" class="" title="Cocoa&amp;framework8">
+
+
 <p>7.终端执行</p>
 <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod <span class="keyword">install</span></span><br></pre></td></tr></table></figure>
-<p><img src="/Users/yongwicky/Documents/Blog/source/_posts/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework9.png" alt=""></p>
+<img src="/2021/04/16/Flutter%E4%B8%8EiOS%E7%9A%84%E6%B7%B7%E5%90%88%E5%BC%80%E5%8F%91/Cocoa&framework9.png" class="" title="Cocoa&amp;framework9">
+
 <p>这样Flutter框架先进入原生项目中，以CocoaPods的形式</p>
 <p>8.打开NativeDemo项目，将NativeDemo/Framework/Debug/App.xcframework拖入项目的Frameworks文件夹中，并把TARGET/General/framework栏中的App.xcframework的Embed由 DO Not Embed 改成 Embed &amp; Sign</p>
 <p>9.照例在ViewController中加入按钮代码，最终也能正常在原生项目中运行Flutter。</p>
